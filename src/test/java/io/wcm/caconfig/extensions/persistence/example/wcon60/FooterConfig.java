@@ -2,7 +2,7 @@
  * #%L
  * wcm.io
  * %%
- * Copyright (C) 2017 wcm.io
+ * Copyright (C) 2019 wcm.io
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,18 @@
  * limitations under the License.
  * #L%
  */
-package io.wcm.caconfig.extensions.persistence.impl;
+package io.wcm.caconfig.extensions.persistence.example.wcon60;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.apache.sling.caconfig.annotation.Configuration;
+import org.apache.sling.caconfig.annotation.Property;
 
-import io.wcm.testing.mock.aem.junit5.AemContextExtension;
+/**
+ * Code example from https://wcm-io.atlassian.net/browse/WCON-60 with collections of collections.
+ */
+@Configuration
+public @interface FooterConfig {
 
-@ExtendWith(AemContextExtension.class)
-class ToolsConfigPagePersistenceStrategyWithPageTest extends ToolsConfigPagePersistenceStrategyTest {
-
-  @BeforeEach
-  void registerAdditionalPersictenceStrategy() throws Exception {
-    context.registerInjectActivateService(new PagePersistenceStrategy(),
-        "enabled", true);
-  }
+  @Property
+  MenuConfig[] menu();
 
 }
