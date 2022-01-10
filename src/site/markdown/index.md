@@ -41,6 +41,11 @@ See [Deploy and configure Context-Aware Configuration in AEM][deploy-configure-c
 |1.0.x - 1.5.x                                          |AEM 6.1+
 
 
+### GitHub Repository
+
+Sources: https://github.com/wcm-io/io.wcm.caconfig.extensions
+
+
 [usage]: usage.html
 [changelog]: changes-report.html
 [deploy-configure-caconfig-in-aem]: https://wcm.io/caconfig/deploy-configure-caconfig-in-aem.html
