@@ -20,7 +20,7 @@
 package io.wcm.caconfig.extensions.references.impl;
 
 import static io.wcm.caconfig.extensions.references.impl.TestUtils.applyConfig;
-import static io.wcm.caconfig.extensions.references.impl.TestUtils.assetReferences;
+import static io.wcm.caconfig.extensions.references.impl.TestUtils.assertReferences;
 import static io.wcm.caconfig.extensions.references.impl.TestUtils.registerConfigurations;
 import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -110,7 +110,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
     ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
     context.registerInjectActivateService(referenceProvider);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
-    assetReferences(references,
+    assertReferences(references,
         "/conf/region1/site1/sling:configs/configA",
         "/conf/region1/sling:configs/configA",
         "/conf/global/sling:configs/configB");
@@ -121,7 +121,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
     ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
     context.registerInjectActivateService(referenceProvider);
     List<Reference> references = referenceProvider.findReferences(site2PageResource);
-    assetReferences(references,
+    assertReferences(references,
         "/conf/region1/site2/sling:configs/configA",
         "/conf/region1/sling:configs/configA",
         "/conf/region1/site2/sling:configs/configB",

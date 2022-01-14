@@ -58,7 +58,7 @@ final class TestUtils {
     configManager.persistConfiguration(contextResource, name, new ConfigurationPersistData(props));
   }
 
-  public static void assetReferences(List<Reference> references, String... paths) {
+  public static void assertReferences(List<Reference> references, String... paths) {
     assertEquals(paths.length, references.size(), "number of references");
     for (int i = 0; i < paths.length; i++) {
       assertEquals(paths[i], references.get(i).getResource().getPath(), "reference #" + i);

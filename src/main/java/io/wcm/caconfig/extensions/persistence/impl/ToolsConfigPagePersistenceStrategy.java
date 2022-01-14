@@ -37,9 +37,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.iterators.FilterIterator;
 import org.apache.commons.collections4.iterators.TransformIterator;
 import org.apache.commons.lang3.StringUtils;
@@ -253,32 +251,22 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   /**
    * Searches the resource hierarchy upwards for all config references and returns them.
    */
-  @SuppressWarnings("unchecked")
   private Iterator<String> findConfigRefs(@NotNull final Resource startResource, @NotNull final Collection<String> bucketNames) {
 
     // collect all context path resources (but filter out those without config reference)
-    final Iterator<ContextResource> contextResources = new FilterIterator(contextPathStrategy.findContextResources(startResource),
-        new Predicate() {
-          @Override
-          public boolean evaluate(Object object) {
-            ContextResource contextResource = (ContextResource)object;
-            return StringUtils.isNotBlank(contextResource.getConfigRef());
-          }
-        });
+    final Iterator<ContextResource> contextResources = new FilterIterator<>(contextPathStrategy.findContextResources(startResource),
+        contextResource -> StringUtils.isNotBlank(contextResource.getConfigRef()));
 
     // get config resource path for each context resource, filter out items where not reference could be resolved
-    final Iterator<String> configPaths = new TransformIterator(contextResources, new Transformer() {
-      @Override
-      public Object transform(Object input) {
-        final ContextResource contextResource = (ContextResource)input;
-        String val = checkPath(contextResource, contextResource.getConfigRef(), bucketNames);
-        if (val != null) {
-          log.trace("+ Found reference for context path {}: {}", contextResource.getResource().getPath(), val);
-        }
-        return val;
-      }
-    });
-    return new FilterIterator(configPaths, PredicateUtils.notNullPredicate());
+    final Iterator<String> configPaths = new TransformIterator<>(contextResources,
+        contextResource -> {
+          String val = checkPath(contextResource, contextResource.getConfigRef(), bucketNames);
+          if (val != null) {
+            log.trace("+ Found reference for context path {}: {}", contextResource.getResource().getPath(), val);
+          }
+          return val;
+        });
+    return new FilterIterator<>(configPaths, PredicateUtils.notNullPredicate());
   }
 
   private String checkPath(final ContextResource contextResource, final String checkRef, final Collection<String> bucketNames) {
@@ -315,31 +303,26 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     return null;
   }
 
-  @SuppressWarnings("unchecked")
   private Iterator<Resource> getResourceInheritanceChainInternal(final Collection<String> bucketNames, final String configName,
       final Iterator<String> paths, final ResourceResolver resourceResolver) {
 
     // find all matching items among all configured paths
-    Iterator<Resource> matchingResources = IteratorUtils.transformedIterator(paths, new Transformer() {
-
-      @Override
-      public Object transform(Object input) {
-        String path = (String)input;
-        for (String bucketName : bucketNames) {
-          final String name = bucketName + "/" + configName;
-          final String configPath = buildResourcePath(path, name);
-          Resource resource = resourceResolver.getResource(configPath);
-          if (resource != null) {
-            log.trace("+ Found matching config resource for inheritance chain: {}", configPath);
-            return resource;
+    Iterator<Resource> matchingResources = IteratorUtils.transformedIterator(paths,
+        path -> {
+          for (String bucketName : bucketNames) {
+            final String name = bucketName + "/" + configName;
+            final String configPath = buildResourcePath(path, name);
+            Resource resource = resourceResolver.getResource(configPath);
+            if (resource != null) {
+              log.trace("+ Found matching config resource for inheritance chain: {}", configPath);
+              return resource;
+            }
+            else {
+              log.trace("- No matching config resource for inheritance chain: {}", configPath);
+            }
           }
-          else {
-            log.trace("- No matching config resource for inheritance chain: {}", configPath);
-          }
-        }
-        return null;
-      }
-    });
+          return null;
+        });
     Iterator<Resource> result = IteratorUtils.filteredIterator(matchingResources, PredicateUtils.notNullPredicate());
     if (result.hasNext()) {
       return result;
@@ -406,6 +389,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   }
 
   @Override
+  @SuppressWarnings("java:S1168")
   public Collection<Resource> getResourceCollection(@NotNull final Resource contentResource, @NotNull final Collection<String> bucketNames,
       @NotNull final String configName) {
     if (!isEnabledAndParamsValid(contentResource, bucketNames, configName)) {
@@ -421,8 +405,8 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("java:S1168")
   public Collection<Iterator<Resource>> getResourceCollectionInheritanceChain(@NotNull final Resource contentResource,
       @NotNull final Collection<String> bucketNames, @NotNull final String configName) {
     if (!isEnabledAndParamsValid(contentResource, bucketNames, configName)) {
@@ -436,14 +420,8 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
 
     // get inheritance chain for each item found
     // yes, this resolves the closest item twice, but is the easiest solution to combine both logic aspects
-    Iterator<Iterator<Resource>> result = IteratorUtils.transformedIterator(resourceCollection.iterator(), new Transformer() {
-
-      @Override
-      public Object transform(Object input) {
-        Resource item = (Resource)input;
-        return getResourceInheritanceChainInternal(bucketNames, configName + "/" + item.getName(), paths.iterator(), resourceResolver);
-      }
-    });
+    Iterator<Iterator<Resource>> result = IteratorUtils.transformedIterator(resourceCollection.iterator(),
+        item -> getResourceInheritanceChainInternal(bucketNames, configName + "/" + item.getName(), paths.iterator(), resourceResolver));
     if (result.hasNext()) {
       return IteratorUtils.toList(result);
     }
