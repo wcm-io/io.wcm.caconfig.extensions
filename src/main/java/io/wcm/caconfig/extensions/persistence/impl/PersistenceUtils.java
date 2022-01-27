@@ -40,6 +40,7 @@ import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.api.resource.ResourceUtil;
 import org.apache.sling.caconfig.management.ConfigurationManagementSettings;
 import org.apache.sling.caconfig.spi.ConfigurationCollectionPersistData;
+import org.apache.sling.caconfig.spi.ConfigurationPersistData;
 import org.apache.sling.caconfig.spi.ConfigurationPersistenceAccessDeniedException;
 import org.apache.sling.caconfig.spi.ConfigurationPersistenceException;
 import org.slf4j.Logger;
@@ -215,7 +216,7 @@ final class PersistenceUtils {
    */
   public static void deleteChildrenNotInCollection(Resource resource, ConfigurationCollectionPersistData data) {
     Set<String> collectionItemNames = data.getItems().stream()
-        .map(item -> item.getCollectionItemName())
+        .map(ConfigurationPersistData::getCollectionItemName)
         .collect(Collectors.toSet());
 
     for (Resource child : resource.getChildren()) {

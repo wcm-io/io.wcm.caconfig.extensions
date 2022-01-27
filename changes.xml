@@ -23,6 +23,16 @@
     xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/plugins/maven-changes-plugin/xsd/changes-1.0.0.xsd">
   <body>
 
+    <release version="1.9.0" date="2022-01-27">
+      <action type="add" dev="sseifert" issue="WCON-75"><![CDATA[
+        Add AEM implementation ConfigurationInjectResourceDetectionStrategy to support correct injection of configurations in HTL and Sling Models in editable template structure components.<br/>
+        This release depends on <b>org.apache.sling.caconfig.spi 1.4.0</b> and <b>org.apache.sling.caconfig.impl 1.6.0</b>
+      ]]></action>
+      <action type="update" dev="sseifert">
+        Switch to AEM 6.5 as minimum version.
+      </action>
+    </release>
+
     <release version="1.8.8" date="2021-11-10">
       <action type="update" dev="cnagel" issue="WCON-86">
         Do not generate warnings for not allowed postfixes.
