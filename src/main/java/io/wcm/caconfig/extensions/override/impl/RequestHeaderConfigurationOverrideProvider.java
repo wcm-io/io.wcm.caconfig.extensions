@@ -49,7 +49,7 @@ public final class RequestHeaderConfigurationOverrideProvider implements Configu
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Override Provider: Request Header",
       description = "Allows to define configuration property default values or overrides from inconming request headers.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Enabled",
         description = "Enable this override provider.")

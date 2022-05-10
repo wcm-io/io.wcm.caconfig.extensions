@@ -80,7 +80,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Persistence Strategy: Tools Config Page",
       description = "Stores Context-Aware Configuration in a single AEM content page at /tools/config.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Enabled",
         description = "Enable this persistence strategy.")

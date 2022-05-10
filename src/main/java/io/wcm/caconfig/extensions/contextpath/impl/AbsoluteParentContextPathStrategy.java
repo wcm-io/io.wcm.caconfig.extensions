@@ -62,7 +62,7 @@ public class AbsoluteParentContextPathStrategy implements ContextPathStrategy {
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Context Path Strategy: Absolute Parents",
       description = "Detects context paths by absolute parent levels of a context resource.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Absolute Levels",
         description = "List of absolute parent levels. Example: Absolute parent level 1 of '/foo/bar/test' is '/foo/bar'.",

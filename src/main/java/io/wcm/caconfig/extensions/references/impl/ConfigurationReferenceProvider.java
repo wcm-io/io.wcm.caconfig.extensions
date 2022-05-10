@@ -74,7 +74,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Reference Provider",
       description = "Allows to resolve references from resources to their Context-Aware configurations, for example during page activation.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Enabled",
         description = "Enable this reference provider.")

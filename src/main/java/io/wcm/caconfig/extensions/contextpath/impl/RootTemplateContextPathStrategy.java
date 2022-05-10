@@ -62,7 +62,7 @@ public class RootTemplateContextPathStrategy implements ContextPathStrategy {
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Context Path Strategy: Root Templates",
       description = "Detects context paths by matching parent pages against a list of allowed templates for context root. "
           + "All page between min and max level up to a page with a page matching the templates are defined as context paths.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Templates",
         description = "List of template paths allowed for context root pages.",

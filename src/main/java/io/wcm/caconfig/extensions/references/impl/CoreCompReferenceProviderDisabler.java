@@ -62,7 +62,7 @@ public class CoreCompReferenceProviderDisabler implements EventHandler {
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Reference Provider Core Component Disabler",
       description = "Disables the context-aware configuration reference provider from Adobe Core Components, which "
           + "does not reliably detect the last modification date of configuration stored in AEM pages.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Enabled",
         description = "Enable to automatic disable the reference provider from Core Components.")
