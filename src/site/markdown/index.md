@@ -2,7 +2,7 @@
 
 AEM-specific extensions for Apache Sling Context-Aware Configuration.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.wcm/io.wcm.caconfig.extensions/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.wcm/io.wcm.caconfig.extensions)
+[![Maven Central](https://img.shields.io/maven-central/v/io.wcm/io.wcm.caconfig.extensions)](https://repo1.maven.org/maven2/io/wcm/io.wcm.caconfig.extensions/)
 
 
 ### Documentation
