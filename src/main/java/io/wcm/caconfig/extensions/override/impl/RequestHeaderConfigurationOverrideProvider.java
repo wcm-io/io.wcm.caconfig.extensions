@@ -21,6 +21,7 @@ package io.wcm.caconfig.extensions.override.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -35,8 +36,6 @@ import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableList;
 
 import io.wcm.sling.commons.request.RequestContext;
 
@@ -85,7 +84,7 @@ public final class RequestHeaderConfigurationOverrideProvider implements Configu
         log.warn("RequestContext service not running - unable to inspect current request.");
       }
     }
-    return ImmutableList.<String>of();
+    return Collections.emptyList();
   }
 
   private Collection<String> buildMapFromHeaders(SlingHttpServletRequest request) {

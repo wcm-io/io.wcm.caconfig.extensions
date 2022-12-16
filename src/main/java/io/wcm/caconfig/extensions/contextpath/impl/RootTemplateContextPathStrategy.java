@@ -46,7 +46,6 @@ import com.day.cq.wcm.api.NameConstants;
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.PageManager;
 import com.day.cq.wcm.api.PageManagerFactory;
-import com.google.common.collect.ImmutableSet;
 
 import io.wcm.wcm.commons.util.Path;
 
@@ -117,7 +116,7 @@ public class RootTemplateContextPathStrategy implements ContextPathStrategy {
 
   @Activate
   void activate(Config config) {
-    templatePaths = config.templatePaths() != null ? ImmutableSet.copyOf(config.templatePaths()) : Collections.<String>emptySet();
+    templatePaths = config.templatePaths() != null ? Set.of(config.templatePaths()) : Collections.<String>emptySet();
     templatMatchAllLevels = config.templateMatchAllLevels();
     minLevel = config.minLevel();
     maxLevel = config.maxLevel();

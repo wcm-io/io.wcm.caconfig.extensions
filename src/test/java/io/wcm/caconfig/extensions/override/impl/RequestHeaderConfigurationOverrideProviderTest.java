@@ -22,12 +22,12 @@ package io.wcm.caconfig.extensions.override.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import io.wcm.sling.commons.request.RequestContext;
 import io.wcm.sling.models.injectors.impl.AemObjectInjector;
@@ -50,7 +50,7 @@ class RequestHeaderConfigurationOverrideProviderTest {
 
         // register sling models extensions
         aemContext.registerInjectActivateService(new ModelsImplConfiguration(),
-            ImmutableMap.<String, Object>of("requestThreadLocal", true));
+            Map.<String, Object>of("requestThreadLocal", true));
 
         aemContext.registerInjectActivateService(new AemObjectInjector());
         aemContext.registerInjectActivateService(new SlingObjectOverlayInjector());
@@ -73,7 +73,7 @@ class RequestHeaderConfigurationOverrideProviderTest {
         "enabled", true,
         "headerName", HEADER_NAME);
 
-    assertEquals(ImmutableList.of(
+    assertEquals(List.of(
         "param1=value1",
         "[/content/path1]param2=value2"),
         provider.getOverrideStrings());

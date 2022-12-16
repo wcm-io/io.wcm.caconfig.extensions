@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
@@ -40,7 +41,6 @@ import com.day.cq.commons.jcr.JcrConstants;
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.reference.Reference;
 import com.day.cq.wcm.api.reference.ReferenceProvider;
-import com.google.common.collect.ImmutableMap;
 
 import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.testing.mock.aem.junit5.AemContextBuilder;
@@ -65,8 +65,8 @@ class ConfigurationReferenceProviderTest {
       .plugin(CACONFIG)
       .build();
 
-  private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(ImmutableMap.of("key", "foo"));
-  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(ImmutableMap.of("key", "bar"));
+  private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
+  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
 
   private Resource site1PageResource;
@@ -76,9 +76,9 @@ class ConfigurationReferenceProviderTest {
   void setup() {
     context.create().resource("/conf");
 
-    context.create().page("/content/region1", null, ImmutableMap.of("sling:configRef", "/conf/region1"));
-    context.create().page("/content/region1/site1", null, ImmutableMap.of("sling:configRef", "/conf/region1/site1"));
-    context.create().page("/content/region1/site2", null, ImmutableMap.of("sling:configRef", "/conf/region1/site2"));
+    context.create().page("/content/region1", null, Map.of("sling:configRef", "/conf/region1"));
+    context.create().page("/content/region1/site1", null, Map.of("sling:configRef", "/conf/region1/site1"));
+    context.create().page("/content/region1/site2", null, Map.of("sling:configRef", "/conf/region1/site2"));
     Page region1Page = context.create().page("/content/region1/page");
     Page site1Page = context.create().page("/content/region1/site1/page");
     Page site2Page = context.create().page("/content/region1/site2/page");
