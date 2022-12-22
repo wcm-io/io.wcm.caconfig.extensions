@@ -7,7 +7,7 @@
 AEM-specific extensions for Apache Sling Context-Aware Configuration.
 
 Documentation: https://wcm.io/caconfig/extensions/<br/>
-Issues: https://wcm-io.atlassian.net/browse/WCON<br/>
+Issues: https://github.com/wcm-io/io.wcm.caconfig.extensions/issues<br/>
 Wiki: https://wcm-io.atlassian.net/wiki/<br/>
 Continuous Integration: https://github.com/wcm-io/io.wcm.caconfig.extensions/actions<br/>
 Commercial support: https://wcm.io/commercial-support.html
