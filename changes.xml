@@ -23,6 +23,18 @@
     xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/plugins/maven-changes-plugin/xsd/changes-1.0.0.xsd">
   <body>
 
+    <release version="1.9.2" date="2023-04-19">
+      <action type="update" dev="sseifert">
+        Switch to Java 11 as minimum version.
+      </action>
+      <action type="update" dev="sseifert">
+        Switch to AEM 6.5.7 as minimum version.
+      </action>
+      <action type="update" dev="sseifert">
+        Eliminate dependency to Guava.
+      </action>
+    </release>
+
     <release version="1.9.0" date="2022-01-27">
       <action type="add" dev="sseifert" issue="WCON-75"><![CDATA[
         Add AEM implementation ConfigurationInjectResourceDetectionStrategy to support correct injection of configurations in HTL and Sling Models in editable template structure components.<br/>

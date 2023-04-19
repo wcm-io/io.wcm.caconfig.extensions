@@ -21,6 +21,7 @@ package io.wcm.caconfig.extensions.override.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -36,8 +37,6 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
-
 import io.wcm.sling.commons.request.RequestContext;
 
 /**
@@ -49,7 +48,7 @@ public final class RequestHeaderConfigurationOverrideProvider implements Configu
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Override Provider: Request Header",
       description = "Allows to define configuration property default values or overrides from inconming request headers.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Enabled",
         description = "Enable this override provider.")
@@ -85,7 +84,7 @@ public final class RequestHeaderConfigurationOverrideProvider implements Configu
         log.warn("RequestContext service not running - unable to inspect current request.");
       }
     }
-    return ImmutableList.<String>of();
+    return Collections.emptyList();
   }
 
   private Collection<String> buildMapFromHeaders(SlingHttpServletRequest request) {

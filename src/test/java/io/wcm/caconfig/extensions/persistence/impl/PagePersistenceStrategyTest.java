@@ -41,7 +41,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.day.cq.wcm.api.Page;
-import com.google.common.collect.ImmutableList;
 
 import io.wcm.caconfig.extensions.persistence.example.ListConfig;
 import io.wcm.caconfig.extensions.persistence.example.ListNestedConfig;
@@ -135,7 +134,7 @@ class PagePersistenceStrategyTest {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
-    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
         ImmutableValueMap.of("stringParam", "value2", "intParam", 234)
     ),
@@ -153,7 +152,7 @@ class PagePersistenceStrategyTest {
     assertThat(configPage2.getContentResource(), ResourceMatchers.props("stringParam", "value2", "intParam", 234));
 
     // read config
-    List<ListConfig> configs = ImmutableList.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).asCollection(ListConfig.class));
+    List<ListConfig> configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).asCollection(ListConfig.class));
     assertEquals(2, configs.size());
     ListConfig config1 = configs.get(0);
     assertEquals("value1", config1.stringParam());
@@ -168,13 +167,13 @@ class PagePersistenceStrategyTest {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
-    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
         ImmutableValueMap.of("stringParam", "value2", "intParam", 234)));
-    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName() + "/item0/jcr:content/subListConfig", ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName() + "/item0/jcr:content/subListConfig", List.of(
         ImmutableValueMap.of("stringParam", "value11"),
         ImmutableValueMap.of("stringParam", "value12")));
-    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName() + "/item1/jcr:content/subListConfig", ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName() + "/item1/jcr:content/subListConfig", List.of(
         ImmutableValueMap.of("stringParam", "value21")));
 
     // assert storage in page in /conf
@@ -191,7 +190,7 @@ class PagePersistenceStrategyTest {
     assertThat(configPage2.getContentResource("subListConfig/item0"), ResourceMatchers.props("stringParam", "value21"));
 
     // read config
-    List<ListNestedConfig> configs = ImmutableList.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
+    List<ListNestedConfig> configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
         .asCollection(ListNestedConfig.class));
     assertEquals(2, configs.size());
 
@@ -209,13 +208,13 @@ class PagePersistenceStrategyTest {
     assertEquals("value21", config2.subListConfig()[0].stringParam());
 
     // update config collection items
-    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1-new", "intParam", 123),
         ImmutableValueMap.of("stringParam", "value2-new", "intParam", 234),
         ImmutableValueMap.of("stringParam", "value3-new", "intParam", 345)));
 
     // read config
-    configs = ImmutableList.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
+    configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
         .asCollection(ListNestedConfig.class));
     assertEquals(3, configs.size());
 
@@ -249,7 +248,7 @@ class PagePersistenceStrategyTest {
     writeConfiguration(context, contentPage.getPath(), NestedConfig.class.getName() + "/jcr:content/subConfig",
         "stringParam", "value2",
         "intParam", 234);
-    writeConfigurationCollection(context, contentPage.getPath(), NestedConfig.class.getName() + "/jcr:content/subListConfig", ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), NestedConfig.class.getName() + "/jcr:content/subListConfig", List.of(
         ImmutableValueMap.of("stringParam", "value3", "intParam", 345),
         ImmutableValueMap.of("stringParam", "value4", "intParam", 456)));
 
@@ -268,7 +267,7 @@ class PagePersistenceStrategyTest {
     assertEquals("value2", subConfig.stringParam());
     assertEquals(234, subConfig.intParam());
 
-    List<ListConfig> subListConfigs = ImmutableList.copyOf(config.subListConfig());
+    List<ListConfig> subListConfigs = List.of(config.subListConfig());
     assertEquals(2, subListConfigs.size());
     ListConfig subListConfig1 = subListConfigs.get(0);
     assertEquals("value3", subListConfig1.stringParam());
@@ -283,7 +282,7 @@ class PagePersistenceStrategyTest {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
-    writeConfigurationCollection(context, contentPage.getPath(), FooterConfig.class.getName() + "/jcr:content/menu/menu1/links", ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), FooterConfig.class.getName() + "/jcr:content/menu/menu1/links", List.of(
         ImmutableValueMap.of("linkText", "text1"),
         ImmutableValueMap.of("linkText", "text2")));
 
@@ -328,7 +327,7 @@ class PagePersistenceStrategyTest {
         "resourceType", "app1/components/page/config");
 
     // write config
-    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), ImmutableList.of(
+    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
         ImmutableValueMap.of("stringParam", "value2", "intParam", 234)),
         ImmutableValueMap.of("sling:configCollectionInherit", true));

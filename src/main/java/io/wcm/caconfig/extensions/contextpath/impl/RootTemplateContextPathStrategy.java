@@ -46,7 +46,6 @@ import com.day.cq.wcm.api.NameConstants;
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.PageManager;
 import com.day.cq.wcm.api.PageManagerFactory;
-import com.google.common.collect.ImmutableSet;
 
 import io.wcm.wcm.commons.util.Path;
 
@@ -62,7 +61,7 @@ public class RootTemplateContextPathStrategy implements ContextPathStrategy {
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Context Path Strategy: Root Templates",
       description = "Detects context paths by matching parent pages against a list of allowed templates for context root. "
           + "All page between min and max level up to a page with a page matching the templates are defined as context paths.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Templates",
         description = "List of template paths allowed for context root pages.",
@@ -117,7 +116,7 @@ public class RootTemplateContextPathStrategy implements ContextPathStrategy {
 
   @Activate
   void activate(Config config) {
-    templatePaths = config.templatePaths() != null ? ImmutableSet.copyOf(config.templatePaths()) : Collections.<String>emptySet();
+    templatePaths = config.templatePaths() != null ? Set.of(config.templatePaths()) : Collections.<String>emptySet();
     templatMatchAllLevels = config.templateMatchAllLevels();
     minLevel = config.minLevel();
     maxLevel = config.maxLevel();

@@ -24,9 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.sling.caconfig.resource.spi.ContextResource;
-
-import com.google.common.collect.ImmutableList;
 
 import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.wcm.commons.util.Path;
@@ -45,7 +44,7 @@ final class TestUtils {
     if (paths.length % 2 != 0) {
       throw new IllegalArgumentException("Expected path pairs.");
     }
-    List<ContextResource> resultList = ImmutableList.copyOf(result);
+    List<ContextResource> resultList = IteratorUtils.toList(result);
     int expectedSize = paths.length / 2;
     assertEquals(expectedSize, resultList.size(), "Number of paths");
     for (int i = 0; i < expectedSize / 2; i++) {

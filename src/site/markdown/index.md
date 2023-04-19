@@ -2,7 +2,7 @@
 
 AEM-specific extensions for Apache Sling Context-Aware Configuration.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.wcm/io.wcm.caconfig.extensions/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.wcm/io.wcm.caconfig.extensions)
+[![Maven Central](https://img.shields.io/maven-central/v/io.wcm/io.wcm.caconfig.extensions)](https://repo1.maven.org/maven2/io/wcm/io.wcm.caconfig.extensions/)
 
 
 ### Documentation
@@ -34,7 +34,8 @@ See [Deploy and configure Context-Aware Configuration in AEM][deploy-configure-c
 
 |Context-Aware Configuration Extensions for AEM version |AEM version supported
 |-------------------------------------------------------|----------------------
-|1.9.x or higher                                        |AEM 6.5+, AEMaaCS
+|1.9.2 or higher                                        |AEM 6.5.7+, AEMaaCS
+|1.9.0                                                  |AEM 6.5+, AEMaaCS
 |1.8.x                                                  |AEM 6.4+, AEMaaCS
 |1.7.x                                                  |AEM 6.3+
 |1.6.x                                                  |AEM 6.2+

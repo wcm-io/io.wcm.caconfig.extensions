@@ -67,7 +67,7 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Persistence Strategy: AEM Page",
       description = "Stores Context-Aware Configuration in AEM pages instead of simple resources.")
-  static @interface Config {
+  @interface Config {
 
     @AttributeDefinition(name = "Enabled",
         description = "Enable this persistence strategy.")

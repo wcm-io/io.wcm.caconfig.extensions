@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
@@ -42,7 +43,6 @@ import com.day.cq.wcm.api.NameConstants;
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.reference.Reference;
 import com.day.cq.wcm.api.reference.ReferenceProvider;
-import com.google.common.collect.ImmutableMap;
 
 import io.wcm.caconfig.extensions.persistence.impl.PagePersistenceStrategy;
 import io.wcm.testing.mock.aem.junit5.AemContext;
@@ -68,8 +68,8 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
       .plugin(CACONFIG)
       .build();
 
-  private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(ImmutableMap.of("key", "foo"));
-  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(ImmutableMap.of("key", "bar"));
+  private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
+  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
 
   private Resource site1PageResource;
@@ -83,9 +83,9 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
     context.create().resource("/conf");
 
-    context.create().page("/content/region1", null, ImmutableMap.of("sling:configRef", "/conf/region1"));
-    context.create().page("/content/region1/site1", null, ImmutableMap.of("sling:configRef", "/conf/region1/site1"));
-    context.create().page("/content/region1/site2", null, ImmutableMap.of("sling:configRef", "/conf/region1/site2"));
+    context.create().page("/content/region1", null, Map.of("sling:configRef", "/conf/region1"));
+    context.create().page("/content/region1/site1", null, Map.of("sling:configRef", "/conf/region1/site1"));
+    context.create().page("/content/region1/site2", null, Map.of("sling:configRef", "/conf/region1/site2"));
     Page region1Page = context.create().page("/content/region1/page");
     Page site1Page = context.create().page("/content/region1/site1/page");
     Page site2Page = context.create().page("/content/region1/site2/page");
@@ -97,7 +97,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
     // store fallback config
     context.create().page("/conf/global/sling:configs/configB", null,
-        ImmutableMap.<String, Object>of("key", "fallback", NameConstants.PN_PAGE_LAST_MOD, TIMESTAMP));
+        Map.<String, Object>of("key", "fallback", NameConstants.PN_PAGE_LAST_MOD, TIMESTAMP));
 
     applyConfig(context, region1Page, "configA", CONFIGURATION_A); // 1 config for region
     applyConfig(context, site1Page, "configA", CONFIGURATION_A); // 1 config on page1 (+1 from region +1 from fallback)
