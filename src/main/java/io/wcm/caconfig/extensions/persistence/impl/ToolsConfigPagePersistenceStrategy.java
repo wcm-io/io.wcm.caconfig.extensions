@@ -99,8 +99,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     int service_ranking() default 2000;
 
     @AttributeDefinition(name = "Relative config path",
-        description = "Relative path to the configuration page content.",
-        defaultValue = "/tools/config/jcr:content")
+        description = "Relative path to the configuration page content.")
     String relativeConfigPath() default "/tools/config/jcr:content";
 
   }
