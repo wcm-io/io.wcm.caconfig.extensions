@@ -98,16 +98,19 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
         description = "Priority of persistence strategy (higher = higher priority).")
     int service_ranking() default 2000;
 
+    @AttributeDefinition(name = "Relative config path",
+        description = "Relative path to the configuration page content.")
+    String relativeConfigPath() default "/tools/config/jcr:content";
+
   }
 
-  private static final String RELATIVE_CONFIG_PATH = "/tools/config/jcr:content";
-  private static final Pattern CONFIG_PATH_PATTERN = Pattern.compile("^.*" + Pattern.quote(RELATIVE_CONFIG_PATH) + "(/.*)?$");
   private static final String DEFAULT_CONFIG_NODE_TYPE = NT_UNSTRUCTURED;
   private static final String PROPERTY_CONFIG_COLLECTION_INHERIT = "sling:configCollectionInherit";
 
   private static final Logger log = LoggerFactory.getLogger(ToolsConfigPagePersistenceStrategy.class);
 
   private boolean enabled;
+  private Pattern configPathPattern;
   private Config config;
 
   @Reference
@@ -122,7 +125,15 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   @Activate
   void activate(Config value) {
     this.enabled = value.enabled();
+    this.configPathPattern = loadConfigPathPattern(value);
     this.config = value;
+  }
+
+  private @Nullable Pattern loadConfigPathPattern(Config value) {
+    String relativeConfigPath = value.relativeConfigPath();
+    return enabled && StringUtils.isNotBlank(relativeConfigPath)
+            ? Pattern.compile(String.format("^.*%s(/.*)?$", relativeConfigPath))
+            : null;
   }
 
   @Override
@@ -242,7 +253,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   }
 
   private boolean isConfigPagePath(String configPath) {
-    return CONFIG_PATH_PATTERN.matcher(configPath).matches();
+    return configPathPattern != null && configPathPattern.matcher(configPath).matches();
   }
 
 
