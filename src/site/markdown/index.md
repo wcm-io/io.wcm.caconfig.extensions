@@ -21,15 +21,6 @@ The following extensions are provided:
 * A [Reference Provider][reference-provider] implementation for context-aware configurations
 
 
-### Supported AEM versions
-
-Context-Aware Configuration is supported in AEM 6.1, 6.2, 6.3 and upwards. AEM 6.0 is not supported.
-
-When you are using AEM 6.1 or 6.2 you have to additionally deploy the Apache Sling Context-Aware Configuration bundles (API, SPI, Impl) to AEM. In AEM 6.3 you have to update the Apache Sling Context-Aware Configuration SPI and Impl bundles to the latest version to use all features.
-
-See [Deploy and configure Context-Aware Configuration in AEM][deploy-configure-caconfig-in-aem] for details.
-
-
 ### AEM Version Support Matrix
 
 |Context-Aware Configuration Extensions for AEM version |AEM version supported
@@ -50,7 +41,6 @@ Sources: https://github.com/wcm-io/io.wcm.caconfig.extensions
 
 [usage]: usage.html
 [changelog]: changes-report.html
-[deploy-configure-caconfig-in-aem]: https://wcm.io/caconfig/deploy-configure-caconfig-in-aem.html
 [context-path-strategies]: context-path-strategies.html
 [persistence-strategies]: persistence-strategies.html
 [override-providers]: override-providers.html
