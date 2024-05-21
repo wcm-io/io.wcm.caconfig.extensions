@@ -25,13 +25,24 @@ The following extensions are provided:
 
 |Context-Aware Configuration Extensions for AEM version |AEM version supported
 |-------------------------------------------------------|----------------------
-|1.9.6 or higher                                        |AEM 6.5.17+, AEMaaCS
-|1.9.2 - 1.9.4                                          |AEM 6.5.7+, AEMaaCS
-|1.9.0                                                  |AEM 6.5+, AEMaaCS
+|1.9.6 or higher                                        |AEM 6.5.17+ *), AEMaaCS
+|1.9.2 - 1.9.4                                          |AEM 6.5.7+ *), AEMaaCS
+|1.9.0                                                  |AEM 6.5+ *), AEMaaCS
 |1.8.x                                                  |AEM 6.4+, AEMaaCS
 |1.7.x                                                  |AEM 6.3+
 |1.6.x                                                  |AEM 6.2+
 |1.0.x - 1.5.x                                          |AEM 6.1+
+
+### Dependencies
+
+*) For version 1.9.0 and up, the bundle depends on `org.apache.sling.caconfig.spi` 1.4.0 and `org.apache.sling.caconfig.impl` 1.6.0 - but AEM 6.5 contains older versions of these bundles. It is recommended to update latest versions of these bundles and deploy them together with your application:
+
+|---|---|---|
+| [Apache Sling Context-Aware Configuration API](https://repo1.maven.org/maven2/org/apache/sling/org.apache.sling.caconfig.api/) | [![Maven Central](https://img.shields.io/maven-central/v/org.apache.sling/org.apache.sling.caconfig.api)](https://repo1.maven.org/maven2/org/apache/sling/org.apache.sling.caconfig.api/) |
+| [Apache Sling Context-Aware Configuration SPI](https://repo1.maven.org/maven2/org/apache/sling/org.apache.sling.caconfig.spi/) | [![Maven Central](https://img.shields.io/maven-central/v/org.apache.sling/org.apache.sling.caconfig.spi)](https://repo1.maven.org/maven2/org/apache/sling/org.apache.sling.caconfig.spi/) |
+| [Apache Sling Context-Aware Configuration Implementation](https://repo1.maven.org/maven2/org/apache/sling/org.apache.sling.caconfig.impl/) | [![Maven Central](https://img.shields.io/maven-central/v/org.apache.sling/org.apache.sling.caconfig.impl)](https://repo1.maven.org/maven2/org/apache/sling/org.apache.sling.caconfig.impl/) |
+
+AEMaaCS includes recent enough versions of these dependencies.
 
 
 ### GitHub Repository
