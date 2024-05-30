@@ -27,13 +27,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.management.ConfigurationManager;
+import org.apache.sling.caconfig.resource.spi.ConfigurationResourceResolvingStrategy;
+import org.apache.sling.caconfig.resource.spi.ContextPathStrategy;
+import org.apache.sling.caconfig.resource.spi.ContextResource;
 import org.apache.sling.hamcrest.ResourceMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -325,6 +332,31 @@ class ToolsConfigPagePersistenceStrategyTest {
     config = contentPageWithCQLastModified.getContentResource().adaptTo(ConfigurationBuilder.class).as(SimpleConfig.class);
     assertNull(config.stringParam());
     assertEquals(5, config.intParam());
+  }
+
+  @Test
+  void testBlacklistedConfigPath() {
+    // create content resource not in /content
+    Resource contentResource = context.create().resource("/conf/global");
+    // allow content resource in context path strategy
+    ContextPathStrategy contextPathStrategy = mock(ContextPathStrategy.class);
+    context.registerService(ContextPathStrategy.class, contextPathStrategy);
+    ContextResource contextResource = new ContextResource(contentResource, "/conf/global", 0);
+    when(contextPathStrategy.findContextResources(any())).then((inv) -> List.of(contextResource).iterator());
+    // load tools config page persistence strategy
+    ConfigurationResourceResolvingStrategy strategy = context.getService(ConfigurationResourceResolvingStrategy.class);
+    // should allow non /content path
+    String configPath = strategy.getResourcePath(contentResource, "sling:configs", "cloudconfigs/translation");
+    assertEquals("/conf/global/sling:configs/cloudconfigs/translation", configPath);
+    // restrict to /content
+    ToolsConfigPagePersistenceStrategy strategyWithBlacklist = context.registerInjectActivateService(new ToolsConfigPagePersistenceStrategy(),
+            "enabled", true,
+            "configPageTemplate", "/apps/app1/templates/configEditor",
+            "structurePageTemplate", "/apps/app1/templates/structurePage",
+            "contextPathRegex", "^/content(/.+)$");
+    configPath = strategyWithBlacklist.getResourcePath(contentResource, "sling:configs", "cloudconfigs/translation");
+    // should not return a config in /conf
+    assertNull(configPath);
   }
 
 }
