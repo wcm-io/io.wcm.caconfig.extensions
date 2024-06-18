@@ -28,7 +28,8 @@
         Switch to AEM 6.5.17 as minimum version.
       </action>
       <action type="update" dev="cnagel" issue="4">
-        Adds context path whitelist to ToolsConfigPagePersistenceStrategy configuration.
+        Adds context path allow list to ToolsConfigPagePersistenceStrategy configuration.
+        This is a (minor) breaking change - by default only configurations stored in /content will work with this strategy.
       </action>
     </release>
 

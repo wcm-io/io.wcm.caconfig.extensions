@@ -102,9 +102,9 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
         description = "Relative path to the configuration page content.")
     String relativeConfigPath() default "/tools/config/jcr:content";
 
-    @AttributeDefinition(name = "Context path whitelist",
-            description = "Expression to match context paths. Context paths matching this expression are allowed. Use groups to reference them in configPathPatterns.")
-    String contextPathRegex();
+    @AttributeDefinition(name = "Context path allow list",
+            description = "Expression to match context paths. Context paths matching this expression are allowed.")
+    String contextPathRegex() default "^/content(/.+)$";
 
   }
 
@@ -311,10 +311,10 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
 
   @SuppressWarnings("unused")
   private boolean isEnabledAndParamsValid(final Resource contentResource, final Collection<String> bucketNames, final String configName) {
-    return enabled && contentResource != null && isContextPathWhitelisted(contentResource.getPath());
+    return enabled && contentResource != null && isContextPathAllowed(contentResource.getPath());
   }
 
-  private boolean isContextPathWhitelisted(String contextPath) {
+  private boolean isContextPathAllowed(String contextPath) {
     return contextPathPattern == null || contextPathPattern.matcher(contextPath).matches();
   }
 
