@@ -102,6 +102,10 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
         description = "Relative path to the configuration page content.")
     String relativeConfigPath() default "/tools/config/jcr:content";
 
+    @AttributeDefinition(name = "Context path allow list",
+            description = "Expression to match context paths. Context paths matching this expression are allowed.")
+    String contextPathRegex() default "^/content(/.+)$";
+
   }
 
   private static final String DEFAULT_CONFIG_NODE_TYPE = NT_UNSTRUCTURED;
@@ -111,6 +115,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
 
   private boolean enabled;
   private Pattern configPathPattern;
+  private Pattern contextPathPattern;
   private Config config;
 
   @Reference
@@ -126,6 +131,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   void activate(Config value) {
     this.enabled = value.enabled();
     this.configPathPattern = loadConfigPathPattern(value);
+    this.contextPathPattern = loadContextPathPattern(value);
     this.config = value;
   }
 
@@ -133,6 +139,13 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     String relativeConfigPath = value.relativeConfigPath();
     return enabled && StringUtils.isNotBlank(relativeConfigPath)
             ? Pattern.compile(String.format("^.*%s(/.*)?$", relativeConfigPath))
+            : null;
+  }
+
+  private @Nullable Pattern loadContextPathPattern(Config value) {
+    String contextPathRegex = value.contextPathRegex();
+    return enabled && StringUtils.isNotBlank(contextPathRegex)
+            ? Pattern.compile(contextPathRegex)
             : null;
   }
 
@@ -298,7 +311,11 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
 
   @SuppressWarnings("unused")
   private boolean isEnabledAndParamsValid(final Resource contentResource, final Collection<String> bucketNames, final String configName) {
-    return enabled && contentResource != null;
+    return enabled && contentResource != null && isContextPathAllowed(contentResource.getPath());
+  }
+
+  private boolean isContextPathAllowed(String contextPath) {
+    return contextPathPattern == null || contextPathPattern.matcher(contextPath).matches();
   }
 
   private String buildResourcePath(String path, String name) {
