@@ -74,7 +74,7 @@ final class TestUtils {
     context.registerService(ConfigurationMetadataProvider.class, metadataProvider);
   }
 
-  private static class DummyConfigurationMetadataProvider implements ConfigurationMetadataProvider {
+  private static final class DummyConfigurationMetadataProvider implements ConfigurationMetadataProvider {
 
     private final Map<String, ConfigurationMetadata> metadata = new HashMap<>();
 

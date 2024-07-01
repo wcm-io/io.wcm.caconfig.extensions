@@ -44,7 +44,7 @@ class AbsoluteParentContextPathStrategyTest {
   protected Resource level4;
 
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     level1 = context.create().page("/content/region1").adaptTo(Resource.class);
     level2 = context.create().page("/content/region1/site1").adaptTo(Resource.class);
     level3 = context.create().page("/content/region1/site1/en").adaptTo(Resource.class);

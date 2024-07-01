@@ -71,7 +71,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   private Page contentPage;
 
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
         "levels", new int[] { 1, 3 },
         "contextPathRegex", "^/content(/.+)$",
@@ -91,7 +91,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testSimpleConfig() throws Exception {
+  void testSimpleConfig() {
     // write config
     writeConfiguration(context, contentPage.getPath(), SimpleConfig.class.getName(),
         "stringParam", "value1",
@@ -127,7 +127,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig() throws Exception {
+  void testListConfig() {
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
@@ -164,7 +164,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig_Nested() throws Exception {
+  void testListConfig_Nested() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
@@ -246,7 +246,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testNestedConfig() throws Exception {
+  void testNestedConfig() {
     // write config
     writeConfiguration(context, contentPage.getPath(), NestedConfig.class.getName(),
         "stringParam", "value1");
@@ -290,7 +290,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testSimpleConfigWithCQLastModified() throws Exception {
+  void testSimpleConfigWithCQLastModified() {
     context.create().page("/content/region2");
     context.create().page("/content/region2/site2");
     context.create().page("/content/region2/site2/en");

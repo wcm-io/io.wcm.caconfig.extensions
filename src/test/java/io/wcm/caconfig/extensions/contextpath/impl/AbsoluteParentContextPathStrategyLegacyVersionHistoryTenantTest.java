@@ -38,7 +38,7 @@ class AbsoluteParentContextPathStrategyLegacyVersionHistoryTenantTest extends Ab
 
   @Override
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     context.registerAdapter(ResourceResolver.class, Tenant.class, tenant);
 
     level1 = context.create().page("/content/versionhistory/tenant1/user1/region1").adaptTo(Resource.class);
