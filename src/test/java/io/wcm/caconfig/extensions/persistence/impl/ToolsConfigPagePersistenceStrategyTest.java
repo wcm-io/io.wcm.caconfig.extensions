@@ -343,7 +343,7 @@ class ToolsConfigPagePersistenceStrategyTest {
     ContextPathStrategy contextPathStrategy = mock(ContextPathStrategy.class);
     context.registerService(ContextPathStrategy.class, contextPathStrategy);
     ContextResource contextResource = new ContextResource(contextRootResource, "/conf/global", 0);
-    when(contextPathStrategy.findContextResources(any())).then((inv) -> List.of(contextResource).iterator());
+    when(contextPathStrategy.findContextResources(any())).then(inv -> List.of(contextResource).iterator());
     // load tools config page persistence strategy
     ConfigurationResourceResolvingStrategy strategy = Objects.requireNonNull(context.getService(ConfigurationResourceResolvingStrategy.class));
     String configPath = strategy.getResourcePath(contextRootResource, "sling:configs", "cloudconfigs/translation");
