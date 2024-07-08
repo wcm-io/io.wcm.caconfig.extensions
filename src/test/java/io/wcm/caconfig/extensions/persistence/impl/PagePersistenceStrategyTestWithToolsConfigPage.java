@@ -28,7 +28,7 @@ import io.wcm.testing.mock.aem.junit5.AemContextExtension;
 class PagePersistenceStrategyTestWithToolsConfigPage extends PagePersistenceStrategyTest {
 
   @BeforeEach
-  void registerAdditionalPersictenceStrategy() throws Exception {
+  void registerAdditionalPersictenceStrategy() {
     context.registerInjectActivateService(new ToolsConfigPagePersistenceStrategy(),
         "enabled", true);
   }

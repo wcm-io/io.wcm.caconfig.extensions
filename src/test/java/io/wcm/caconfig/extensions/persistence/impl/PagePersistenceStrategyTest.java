@@ -78,14 +78,14 @@ class PagePersistenceStrategyTest {
   private Page contentPage;
 
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     context.create().resource("/conf");
     contentPage = context.create().page("/content/test/site1", "/apps/app1/templates/template1",
         ImmutableValueMap.of("sling:configRef", "/conf/test/site1"));
   }
 
   @Test
-  void testSimpleConfig() throws Exception {
+  void testSimpleConfig() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
@@ -111,7 +111,7 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testSimpleConfig_Disabled() throws Exception {
+  void testSimpleConfig_Disabled() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", false);
 
     // write config
@@ -130,7 +130,7 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig() throws Exception {
+  void testListConfig() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
@@ -163,7 +163,7 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig_Nested() throws Exception {
+  void testListConfig_Nested() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
@@ -239,7 +239,7 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testNestedConfig() throws Exception {
+  void testNestedConfig() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
@@ -278,7 +278,7 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testDeeplyNestedConfig_WCON60() throws Exception {
+  void testDeeplyNestedConfig_WCON60() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
@@ -305,7 +305,7 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testSimpleConfig_ResourceType() throws Exception {
+  void testSimpleConfig_ResourceType() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true,
         "resourceType", "app1/components/page/config");
 
@@ -322,7 +322,7 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig_ResourceType() throws Exception {
+  void testListConfig_ResourceType() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true,
         "resourceType", "app1/components/page/config");
 

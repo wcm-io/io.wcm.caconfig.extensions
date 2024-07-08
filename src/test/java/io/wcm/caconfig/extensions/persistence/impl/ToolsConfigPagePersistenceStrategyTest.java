@@ -27,13 +27,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.management.ConfigurationManager;
+import org.apache.sling.caconfig.resource.spi.ConfigurationResourceResolvingStrategy;
+import org.apache.sling.caconfig.resource.spi.ContextPathStrategy;
+import org.apache.sling.caconfig.resource.spi.ContextResource;
 import org.apache.sling.hamcrest.ResourceMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +71,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   private Page contentPage;
 
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
         "levels", new int[] { 1, 3 },
         "contextPathRegex", "^/content(/.+)$",
@@ -83,7 +91,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testSimpleConfig() throws Exception {
+  void testSimpleConfig() {
     // write config
     writeConfiguration(context, contentPage.getPath(), SimpleConfig.class.getName(),
         "stringParam", "value1",
@@ -119,7 +127,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig() throws Exception {
+  void testListConfig() {
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
@@ -156,7 +164,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig_Nested() throws Exception {
+  void testListConfig_Nested() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
     // write config
@@ -238,7 +246,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testNestedConfig() throws Exception {
+  void testNestedConfig() {
     // write config
     writeConfiguration(context, contentPage.getPath(), NestedConfig.class.getName(),
         "stringParam", "value1");
@@ -282,7 +290,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
-  void testSimpleConfigWithCQLastModified() throws Exception {
+  void testSimpleConfigWithCQLastModified() {
     context.create().page("/content/region2");
     context.create().page("/content/region2/site2");
     context.create().page("/content/region2/site2/en");
@@ -325,6 +333,22 @@ class ToolsConfigPagePersistenceStrategyTest {
     config = contentPageWithCQLastModified.getContentResource().adaptTo(ConfigurationBuilder.class).as(SimpleConfig.class);
     assertNull(config.stringParam());
     assertEquals(5, config.intParam());
+  }
+
+  @Test
+  void shouldNotAllowContextPathOutsideOfConfiguredPattern() {
+    // create context root resource not in /conf
+    Resource contextRootResource = context.create().resource("/conf/global");
+    // allow context root resource in context path strategy
+    ContextPathStrategy contextPathStrategy = mock(ContextPathStrategy.class);
+    context.registerService(ContextPathStrategy.class, contextPathStrategy);
+    ContextResource contextResource = new ContextResource(contextRootResource, "/conf/global", 0);
+    when(contextPathStrategy.findContextResources(any())).then(inv -> List.of(contextResource).iterator());
+    // load tools config page persistence strategy
+    ConfigurationResourceResolvingStrategy strategy = Objects.requireNonNull(context.getService(ConfigurationResourceResolvingStrategy.class));
+    String configPath = strategy.getResourcePath(contextRootResource, "sling:configs", "cloudconfigs/translation");
+    // should not return a config in /conf
+    assertNull(configPath);
   }
 
 }

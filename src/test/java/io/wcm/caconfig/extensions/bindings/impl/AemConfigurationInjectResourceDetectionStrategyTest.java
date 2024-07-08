@@ -46,7 +46,7 @@ class AemConfigurationInjectResourceDetectionStrategyTest {
   private ConfigurationInjectResourceDetectionStrategyMultiplexer strategyMultiplexer;
 
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     context.registerInjectActivateService(AemConfigurationInjectResourceDetectionStrategy.class);
     strategyMultiplexer = context.getService(ConfigurationInjectResourceDetectionStrategyMultiplexer.class);
   }
