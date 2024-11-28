@@ -32,8 +32,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import com.day.cq.commons.jcr.JcrConstants;
+import com.day.cq.dam.api.DamConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.caconfig.management.ConfigurationResourceResolverConfig;
 import org.apache.sling.caconfig.management.multiplexer.ConfigurationResourceResolvingStrategyMultiplexer;
@@ -61,7 +65,7 @@ import com.day.cq.wcm.api.reference.ReferenceProvider;
  * </p>
  * <p>
  * This is for example used by ActivationReferenceSearchServlet to resolve referenced content of pages during activation
- * of a page using AEM sites. Returning the configurations allows the editor to activate them along with the page
+ * of a page using AEM sites. Returning the configurations and asset references allows the editor to activate them along with the page
  * referring to them.
  * </p>
  * <p>
@@ -73,7 +77,7 @@ import com.day.cq.wcm.api.reference.ReferenceProvider;
 public class ConfigurationReferenceProvider implements ReferenceProvider {
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Reference Provider",
-      description = "Allows to resolve references from resources to their Context-Aware configurations, for example during page activation.")
+          description = "Allows to resolve references from resources to their Context-Aware configurations & assets, for example during page activation.")
   @interface Config {
 
     @AttributeDefinition(name = "Enabled",
@@ -127,6 +131,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     Map<String, ConfigurationMetadata> configurationMetadatas = new TreeMap<>(configurationManager.getConfigurationNames().stream()
         .collect(Collectors.toMap(configName -> configName, configName -> configurationManager.getConfigurationMetadata(configName))));
     List<com.day.cq.wcm.api.reference.Reference> references = new ArrayList<>();
+    List<com.day.cq.wcm.api.reference.Reference> assetReferences = new ArrayList<>();
     Set<String> configurationBuckets = new LinkedHashSet<>(configurationResourceResolverConfig.configBucketNames());
 
     for (String configurationName : configurationMetadatas.keySet()) {
@@ -137,7 +142,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
         Resource configurationResource = configurationInheritanceChain.next();
 
         // get page for configuration resource - and all children (e.g. for config collections)
-        // collect in map to elimnate duplicate pages
+        // collect in map to eliminate duplicate pages
         Page configPage = pageManager.getContainingPage(configurationResource);
         if (configPage != null) {
           referencePages.put(configPage.getPath(), configPage);
@@ -151,9 +156,14 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
       // generate references for each page (but not if the context page itself is included as well)
       referencePages.values().stream()
-          .filter(item -> !StringUtils.equals(contextPage.getPath(), item.getPath()))
-          .forEach(item -> references.add(toReference(resource, item, configurationMetadatas, configurationBuckets)));
+              .filter(item -> !StringUtils.equals(contextPage.getPath(), item.getPath()))
+              .forEach(item -> {
+                references.add(toReference(resource, item, configurationMetadatas, configurationBuckets));
+                AddAssetReferencesOfaResource(assetReferences, item, resource.getResourceResolver());
+              });
     }
+
+    references.addAll(assetReferences);
 
     log.debug("Found {} references for resource {}", references.size(), resource.getPath());
     return references;
@@ -200,4 +210,54 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     return REFERENCE_TYPE;
   }
 
+  /**
+   * Adds asset references from the given page to the provided list of asset references.
+   * This method checks the properties of the `jcr:content` node of the modified page for any
+   * references to assets in the `/content/dam/` path. If such references are found, they are
+   * added to the list of asset references.
+   *
+   * @param assetReferences The list to which asset references will be added.
+   * @param configPage The page whose properties are checked for asset references.
+   * @param resourceResolver The resource resolver used to resolve asset paths.
+   */
+  private void AddAssetReferencesOfaResource(List<com.day.cq.wcm.api.reference.Reference> assetReferences, Page configPage, ResourceResolver resourceResolver) {
+    Resource configPageContentRes = configPage.getContentResource();
+    if (configPageContentRes == null) {
+      return;
+    }
+    ValueMap properties = configPageContentRes.getValueMap();
+    for (String propertyName : properties.keySet()) {
+      Object propertyValue = properties.get(propertyName);
+      if (propertyValue instanceof String && ((String) propertyValue).startsWith(DamConstants.MOUNTPOINT_ASSETS)) {
+        Resource assetResource = resourceResolver.getResource((String) propertyValue);
+        if (isAssetReference(assetResource)) {
+          assetReferences.add(new com.day.cq.wcm.api.reference.Reference(DamConstants.ACTIVITY_TYPE_ASSET, assetResource.getName(), assetResource, getAssetLastModified(assetResource)));
+        }
+      }
+    }
+  }
+
+
+  private static long getAssetLastModified(Resource assetResource) {
+    // Navigate to jcr:content node of the asset
+    Resource contentResource = assetResource.getChild(JcrConstants.JCR_CONTENT);
+    if (contentResource != null) {
+      ValueMap properties = contentResource.getValueMap();
+
+      // Try to get cq:lastModified
+      Calendar lastModified = properties.get("cq:lastModified", Calendar.class);
+      if (lastModified == null) {
+        // Fallback to jcr:lastModified
+        lastModified = properties.get(JcrConstants.JCR_LASTMODIFIED, Calendar.class);
+      }
+      return lastModified != null ? lastModified.getTimeInMillis() : 0;
+    }
+
+    return 0; // No jcr:content node or last modified information
+  }
+
+
+  private boolean isAssetReference(Resource assetResource) {
+    return assetResource != null && DamConstants.NT_DAM_ASSET.equals(assetResource.getResourceType());
+  }
 }

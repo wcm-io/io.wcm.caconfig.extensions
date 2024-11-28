@@ -30,10 +30,12 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import io.wcm.wcm.commons.contenttype.ContentType;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.wrappers.ValueMapDecorator;
 import org.apache.sling.testing.mock.osgi.MockOsgi;
+import org.apache.sling.testing.mock.sling.ResourceResolverType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +71,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
       .build();
 
   private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
-  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar"));
+  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar", "imageIcon", "/content/dam/test.jpg"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
 
   private Resource site1PageResource;
@@ -140,6 +142,24 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
     assertEquals(ConfigurationReferenceProvider.REFERENCE_TYPE, ref.getType());
     assertEquals("conf / global / Configuration B", ref.getName());
     assertEquals(TIMESTAMP.getTimeInMillis(), ref.getLastModified());
+  }
+
+  @Test
+  void testReferencesOfPage2_assetReferences() {
+    context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.PNG);
+    //context.create().asset("/content/dam/test.jpg", 100, 100, "image/jpeg");
+    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
+    context.registerInjectActivateService(referenceProvider);
+    List<Reference> references = referenceProvider.findReferences(site2PageResource);
+
+    assertReferences(references,
+            "/conf/region1/site2/sling:configs/configA",
+            "/conf/region1/sling:configs/configA",
+            "/conf/region1/site2/sling:configs/configB",
+            "/conf/global/sling:configs/configB", "/content/dam/test.jpg");
+    boolean hasAssetReference = references.stream()
+            .anyMatch(ref -> ref.getType().equals("asset") && ref.getResource().getPath().startsWith("/content/dam/"));
+    assertTrue(hasAssetReference, "Asset references are present");
   }
 
   @Test

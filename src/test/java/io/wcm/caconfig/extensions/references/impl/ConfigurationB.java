@@ -26,4 +26,6 @@ import org.apache.sling.caconfig.annotation.Configuration;
 
   String key() default "";
 
+  String imageIcon() default "";
+
 }
