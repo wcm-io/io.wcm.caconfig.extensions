@@ -38,6 +38,7 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.api.resource.ResourceUtil;
+import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.caconfig.management.ConfigurationManagementSettings;
 import org.apache.sling.caconfig.spi.ConfigurationCollectionPersistData;
 import org.apache.sling.caconfig.spi.ConfigurationPersistData;
@@ -279,6 +280,34 @@ final class PersistenceUtils {
     catch (PersistenceException ex) {
       throw convertPersistenceException("Unable to persist configuration changes to " + relatedResourcePath, ex);
     }
+  }
+
+  /**
+   * Checks if the given item is modified or newly added by comparing its properties with the current state of the resource.
+   *
+   * @param resolver The ResourceResolver to access the resource.
+   * @param resourcePath The path of the resource to compare against.
+   * @param item The ConfigurationPersistData item containing the properties to compare.
+   * @return true if the resource does not exist or if any property value differs, false otherwise.
+   */
+  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item) {
+    Resource resource = resolver.getResource(resourcePath);
+    if (resource == null) {
+      return true; // Resource does not exist, so it is considered modified
+    }
+
+    ValueMap currentProperties = resource.getValueMap();
+    Map<String, Object> itemProperties = item.getProperties();
+
+    for (Map.Entry<String, Object> entry : itemProperties.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      if (!value.equals(currentProperties.get(key))) {
+        return true; // Property value differs
+      }
+    }
+
+    return false; // No differences found
   }
 
   /**

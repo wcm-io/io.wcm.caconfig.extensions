@@ -30,6 +30,7 @@ import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.ensur
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.getOrCreateResource;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.replaceProperties;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.updatePageLastMod;
+import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.isItemModifiedOrNewlyAdded;
 
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
@@ -210,9 +211,11 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
     // create new or overwrite existing children
     for (ConfigurationPersistData item : data.getItems()) {
       String path = getCollectionItemResourcePath(parentPath + "/" + item.getCollectionItemName());
-      ensureContainingPage(resolver, path, resourceType, configurationManagementSettings);
-      getOrCreateResource(resolver, path, DEFAULT_CONFIG_NODE_TYPE, item.getProperties(), configurationManagementSettings);
-      updatePageLastMod(resolver, pageManager, path);
+      if (isItemModifiedOrNewlyAdded(resolver, path, item)) {
+        ensureContainingPage(resolver, path, resourceType, configurationManagementSettings);
+        getOrCreateResource(resolver, path, DEFAULT_CONFIG_NODE_TYPE, item.getProperties(), configurationManagementSettings);
+        updatePageLastMod(resolver, pageManager, path);
+      }
     }
 
     // if resource collection parent properties are given replace them as well
