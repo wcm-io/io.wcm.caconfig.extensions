@@ -30,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.sling.api.resource.PersistenceException;
+import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.hamcrest.ResourceMatchers;
@@ -159,6 +162,38 @@ class PagePersistenceStrategyTest {
     ListConfig config2 = configs.get(1);
     assertEquals("value2", config2.stringParam());
     assertEquals(234, config2.intParam());
+  }
+
+  @Test
+  void testListConfig_updateLastModifiedIfPropertyRemoved() throws PersistenceException {
+    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    ResourceResolver resourceResolver = context.resourceResolver();
+
+
+    // write config
+    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
+            ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+            ImmutableValueMap.of("stringParam", "value2", "intParam", 234)
+    ));
+
+    // assert storage in page in /conf
+    Page parentPage = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListConfig.class.getName());
+    assertNotNull(parentPage);
+
+    Page configPage1 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListConfig.class.getName() + "/item0");
+    assertThat(configPage1.getContentResource(), ResourceMatchers.props("stringParam", "value1", "intParam", 123));
+
+    Page configPage2 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListConfig.class.getName() + "/item1");
+    assertThat(configPage2.getContentResource(), ResourceMatchers.props("stringParam", "value2", "intParam", 234));
+
+    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
+            ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+            ImmutableValueMap.of("stringParam", "value2")
+    ));
+    Calendar lastModifiedConfigPage2AfterUpdate = configPage2.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
+    System.out.println(lastModifiedConfigPage2AfterUpdate);
+    //ConfigPage2 last modified date should be updated because it is updated
+      assertNotNull(lastModifiedConfigPage2AfterUpdate);
   }
 
   @Test

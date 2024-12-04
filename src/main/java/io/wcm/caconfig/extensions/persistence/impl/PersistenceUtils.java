@@ -285,29 +285,31 @@ final class PersistenceUtils {
   /**
    * Checks if the given item is modified or newly added by comparing its properties with the current state of the resource.
    *
-   * @param resolver The ResourceResolver to access the resource.
+   * @param resolver     The ResourceResolver to access the resource.
    * @param resourcePath The path of the resource to compare against.
-   * @param item The ConfigurationPersistData item containing the properties to compare.
+   * @param item         The ConfigurationPersistData item containing the properties to compare.
+   * @param settings     The ConfigurationManagementSettings to determine which properties to ignore.
    * @return true if the resource does not exist or if any property value differs, false otherwise.
    */
-  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item) {
+  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item, ConfigurationManagementSettings settings) {
     Resource resource = resolver.getResource(resourcePath);
     if (resource == null) {
       return true; // Resource does not exist, so it is considered modified
     }
+    ValueMap valueMap = resource.getValueMap();
+    Map<String, Object> currentProperties = new HashMap<>(valueMap);
+    Map<String, Object> newProperties = new HashMap<>(item.getProperties());
 
-    ValueMap currentProperties = resource.getValueMap();
-    Map<String, Object> itemProperties = item.getProperties();
+    // Filter out ignored properties
+    Set<String> currentPropertyNames = new HashSet<>(currentProperties.keySet());
+    PropertiesFilterUtil.removeIgnoredProperties(currentPropertyNames, settings);
+    currentProperties.keySet().retainAll(currentPropertyNames);
 
-    for (Map.Entry<String, Object> entry : itemProperties.entrySet()) {
-      String key = entry.getKey();
-      Object value = entry.getValue();
-      if (!value.equals(currentProperties.get(key))) {
-        return true; // Property value differs
-      }
-    }
+    Set<String> newPropertyNames = new HashSet<>(newProperties.keySet());
+    PropertiesFilterUtil.removeIgnoredProperties(newPropertyNames, settings);
+    newProperties.keySet().retainAll(newPropertyNames);
 
-    return false; // No differences found
+    return !currentProperties.equals(newProperties);
   }
 
   /**
