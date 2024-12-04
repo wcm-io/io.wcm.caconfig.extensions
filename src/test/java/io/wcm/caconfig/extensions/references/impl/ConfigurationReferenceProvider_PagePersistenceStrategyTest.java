@@ -35,7 +35,6 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.wrappers.ValueMapDecorator;
 import org.apache.sling.testing.mock.osgi.MockOsgi;
-import org.apache.sling.testing.mock.sling.ResourceResolverType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -146,8 +145,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesOfPage2_assetReferences() {
-    context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.PNG);
-    //context.create().asset("/content/dam/test.jpg", 100, 100, "image/jpeg");
+    context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.JPEG);
     ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
     context.registerInjectActivateService(referenceProvider);
     List<Reference> references = referenceProvider.findReferences(site2PageResource);

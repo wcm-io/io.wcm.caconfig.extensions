@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import com.day.cq.commons.jcr.JcrConstants;
+import com.day.cq.dam.api.Asset;
 import com.day.cq.dam.api.DamConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.resource.Resource;
@@ -159,7 +160,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
               .filter(item -> !StringUtils.equals(contextPage.getPath(), item.getPath()))
               .forEach(item -> {
                 references.add(toReference(resource, item, configurationMetadatas, configurationBuckets));
-                AddAssetReferencesOfaResource(assetReferences, item, resource.getResourceResolver());
+                addAssetReferencesOfResource(assetReferences, item, resource.getResourceResolver());
               });
     }
 
@@ -220,14 +221,14 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
    * @param configPage The page whose properties are checked for asset references.
    * @param resourceResolver The resource resolver used to resolve asset paths.
    */
-  private void AddAssetReferencesOfaResource(List<com.day.cq.wcm.api.reference.Reference> assetReferences, Page configPage, ResourceResolver resourceResolver) {
+  private void addAssetReferencesOfResource(List<com.day.cq.wcm.api.reference.Reference> assetReferences, Page configPage, ResourceResolver resourceResolver) {
     Resource configPageContentRes = configPage.getContentResource();
     if (configPageContentRes == null) {
       return;
     }
     ValueMap properties = configPageContentRes.getValueMap();
-    for (String propertyName : properties.keySet()) {
-      Object propertyValue = properties.get(propertyName);
+    for (Map.Entry<String, Object> entry : properties.entrySet()) {
+      Object propertyValue = entry.getValue();
       if (propertyValue instanceof String && ((String) propertyValue).startsWith(DamConstants.MOUNTPOINT_ASSETS)) {
         Resource assetResource = resourceResolver.getResource((String) propertyValue);
         if (isAssetReference(assetResource)) {
@@ -237,23 +238,14 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     }
   }
 
-
   private static long getAssetLastModified(Resource assetResource) {
-    // Navigate to jcr:content node of the asset
-    Resource contentResource = assetResource.getChild(JcrConstants.JCR_CONTENT);
-    if (contentResource != null) {
-      ValueMap properties = contentResource.getValueMap();
-
-      // Try to get cq:lastModified
-      Calendar lastModified = properties.get("cq:lastModified", Calendar.class);
-      if (lastModified == null) {
-        // Fallback to jcr:lastModified
-        lastModified = properties.get(JcrConstants.JCR_LASTMODIFIED, Calendar.class);
+    if (assetResource != null) {
+      Asset asset = assetResource.adaptTo(Asset.class);
+      if (asset != null) {
+        return asset.getLastModified();
       }
-      return lastModified != null ? lastModified.getTimeInMillis() : 0;
     }
-
-    return 0; // No jcr:content node or last modified information
+    return 0;
   }
 
 
