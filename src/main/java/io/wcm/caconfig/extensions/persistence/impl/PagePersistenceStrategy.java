@@ -57,6 +57,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * AEM-specific persistence strategy that has higher precedence than the default strategy from Sling,
  * but lower precedence that the persistence strategy that is part of AEM since version 6.3.
+ *
  * <p>
  * It supports reading configurations from cq:Page nodes in /conf, the configuration is read from the jcr:content child
  * node. Unlike the persistence strategy in AEM 6.3 this also supports writing configuration to /conf.

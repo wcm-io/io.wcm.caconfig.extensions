@@ -38,15 +38,18 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * to the core components. It implements a much simplified logic compared to {@link ConfigurationReferenceProvider}
  * and does not properly detect the last modification date if one of the wcm.io persistence strategies
  * is used which stores the configuration in AEM pages that can be properly activated.
+ *
  * <p>
  * To avoid conflicts with the two implementations trying to achieve the same, this services checks if
  * the Core Component reference provider is present, and deactivates it.
  * </p>
+ *
  * <p>
  * Unfortunately there is no better way, as the Core Component reference provider does not support to be disabled via
  * OSGi configuration, and the AEM WCM Core implementation does not sort the reference providers by service ranking.
  * If both reference providers are active at the same time it's a matter of luck who "wins".
  * </p>
+ *
  * <p>
  * The implementation of this service is heavily inspired by the "Component Disabler" of ACS AEM Commons.
  * </p>

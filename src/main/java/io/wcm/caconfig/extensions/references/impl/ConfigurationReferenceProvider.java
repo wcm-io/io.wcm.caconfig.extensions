@@ -55,15 +55,15 @@ import com.day.cq.wcm.api.PageManagerFactory;
 import com.day.cq.wcm.api.reference.ReferenceProvider;
 
 /**
- * <p>
  * This implementation of {@link ReferenceProvider} allows to resolve references of a given {@link Resource} to
  * context-aware configurations.
- * </p>
+ *
  * <p>
  * This is for example used by ActivationReferenceSearchServlet to resolve referenced content of pages during activation
  * of a page using AEM sites. Returning the configurations allows the editor to activate them along with the page
  * referring to them.
  * </p>
+ *
  * <p>
  * This component can be disabled by configuration, but its enabled by default.
  * </p>
@@ -130,7 +130,8 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     Set<String> configurationBuckets = new LinkedHashSet<>(configurationResourceResolverConfig.configBucketNames());
 
     for (String configurationName : configurationMetadatas.keySet()) {
-      Iterator<Resource> configurationInheritanceChain = configurationResourceResolvingStrategy.getResourceInheritanceChain(resource, configurationBuckets, configurationName);
+      Iterator<Resource> configurationInheritanceChain = configurationResourceResolvingStrategy.getResourceInheritanceChain(resource, configurationBuckets,
+          configurationName);
       Map<String, Page> referencePages = new LinkedHashMap<>();
 
       while (configurationInheritanceChain != null && configurationInheritanceChain.hasNext()) {
