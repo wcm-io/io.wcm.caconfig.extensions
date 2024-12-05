@@ -25,14 +25,15 @@ import static io.wcm.caconfig.extensions.persistence.testcontext.PersistenceTest
 import static org.apache.sling.api.resource.ResourceResolver.PROPERTY_RESOURCE_TYPE;
 import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.sling.api.resource.PersistenceException;
-import org.apache.sling.api.resource.Resource;
-import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.hamcrest.ResourceMatchers;
@@ -165,10 +166,8 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig_updateLastModifiedIfPropertyRemoved() throws PersistenceException {
+  void testListConfig_updateLastModifiedIfPropertyRemoved() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
-    ResourceResolver resourceResolver = context.resourceResolver();
-
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
