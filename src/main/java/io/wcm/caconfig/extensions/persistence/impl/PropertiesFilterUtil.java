@@ -19,6 +19,8 @@
  */
 package io.wcm.caconfig.extensions.persistence.impl;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.sling.caconfig.management.ConfigurationManagementSettings;
@@ -28,13 +30,19 @@ import org.apache.sling.caconfig.management.ConfigurationManagementSettings;
  */
 final class PropertiesFilterUtil {
 
-    private PropertiesFilterUtil() {
-        // static methods only
-    }
+  private PropertiesFilterUtil() {
+    // static methods only
+  }
 
-    public static void removeIgnoredProperties(Set<String> propertyNames, ConfigurationManagementSettings settings) {
-        Set<String> ignoredProperties = settings.getIgnoredPropertyNames(propertyNames);
-        propertyNames.removeAll(ignoredProperties);
-    }
+  public static void removeIgnoredProperties(Set<String> propertyNames, ConfigurationManagementSettings settings) {
+    Set<String> ignoredProperties = settings.getIgnoredPropertyNames(propertyNames);
+    propertyNames.removeAll(ignoredProperties);
+  }
+
+  public static void removeIgnoredProperties(Map<String, Object> properties, ConfigurationManagementSettings settings) {
+    Set<String> propertyNames = new HashSet<>(properties.keySet());
+    removeIgnoredProperties(propertyNames, settings);
+    properties.keySet().retainAll(propertyNames);
+  }
 
 }

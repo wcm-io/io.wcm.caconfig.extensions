@@ -282,6 +282,31 @@ final class PersistenceUtils {
   }
 
   /**
+   * Checks if the given item is modified or newly added by comparing its properties with the current state of the resource.
+   *
+   * @param resolver     The ResourceResolver to access the resource.
+   * @param resourcePath The path of the resource to compare against.
+   * @param item         The ConfigurationPersistData item containing the properties to compare.
+   * @param settings     The ConfigurationManagementSettings to determine which properties to ignore.
+   * @return true if the resource does not exist or if any property value differs, false otherwise.
+   */
+  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item, ConfigurationManagementSettings settings) {
+    Resource resource = resolver.getResource(resourcePath);
+    if (resource == null) {
+      return true; // Resource does not exist, so it is considered modified
+    }
+
+    Map<String, Object> currentProperties = new HashMap<>(resource.getValueMap());
+    Map<String, Object> newProperties = new HashMap<>(item.getProperties());
+
+    // Filter out ignored properties
+    PropertiesFilterUtil.removeIgnoredProperties(currentProperties, settings);
+    PropertiesFilterUtil.removeIgnoredProperties(newProperties, settings);
+
+    return !currentProperties.equals(newProperties);
+  }
+
+  /**
    * If the given resource points to an AEM page, delete the page using PageManager.
    * Otherwise delete the resource using ResourceResolver.
    * @param resource Resource to delete

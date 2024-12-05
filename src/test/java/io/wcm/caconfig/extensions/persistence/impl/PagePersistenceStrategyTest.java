@@ -19,16 +19,19 @@
  */
 package io.wcm.caconfig.extensions.persistence.impl;
 
+import static com.day.cq.wcm.api.NameConstants.PN_LAST_MOD;
 import static io.wcm.caconfig.extensions.persistence.testcontext.PersistenceTestUtils.writeConfiguration;
 import static io.wcm.caconfig.extensions.persistence.testcontext.PersistenceTestUtils.writeConfigurationCollection;
 import static org.apache.sling.api.resource.ResourceResolver.PROPERTY_RESOURCE_TYPE;
 import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.apache.sling.caconfig.ConfigurationBuilder;
@@ -163,6 +166,36 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
+  void testListConfig_updateLastModifiedIfPropertyRemoved() {
+    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+
+    // write config
+    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
+            ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+            ImmutableValueMap.of("stringParam", "value2", "intParam", 234)
+    ));
+
+    // assert storage in page in /conf
+    Page parentPage = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListConfig.class.getName());
+    assertNotNull(parentPage);
+
+    Page configPage1 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListConfig.class.getName() + "/item0");
+    assertThat(configPage1.getContentResource(), ResourceMatchers.props("stringParam", "value1", "intParam", 123));
+
+    Page configPage2 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListConfig.class.getName() + "/item1");
+    assertThat(configPage2.getContentResource(), ResourceMatchers.props("stringParam", "value2", "intParam", 234));
+
+    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
+            ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+            ImmutableValueMap.of("stringParam", "value2")
+    ));
+    Calendar lastModifiedConfigPage2AfterUpdate = configPage2.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
+    System.out.println(lastModifiedConfigPage2AfterUpdate);
+    //ConfigPage2 last modified date should be updated because it is updated
+      assertNotNull(lastModifiedConfigPage2AfterUpdate);
+  }
+
+  @Test
   void testListConfig_Nested() {
     context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
 
@@ -207,10 +240,14 @@ class PagePersistenceStrategyTest {
     assertEquals(1, config2.subListConfig().length);
     assertEquals("value21", config2.subListConfig()[0].stringParam());
 
+
+    Calendar lastModifiedConfigPage1 = configPage1.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
+    Calendar lastModifiedConfigPage2 = configPage2.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
+
     // update config collection items
     writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1-new", "intParam", 123),
-        ImmutableValueMap.of("stringParam", "value2-new", "intParam", 234),
+        ImmutableValueMap.of("stringParam", "value2", "intParam", 234),
         ImmutableValueMap.of("stringParam", "value3-new", "intParam", 345)));
 
     // read config
@@ -224,18 +261,34 @@ class PagePersistenceStrategyTest {
     assertEquals(2, config1.subListConfig().length);
     assertEquals("value11", config1.subListConfig()[0].stringParam());
     assertEquals("value12", config1.subListConfig()[1].stringParam());
+    //ConfigPage1 last modified date should be updated because it is updated
+    assertTrue(configLastModifiedUpdated(configPage1, false, lastModifiedConfigPage1));
 
     config2 = configs.get(1);
-    assertEquals("value2-new", config2.stringParam());
+    assertEquals("value2", config2.stringParam());
     assertEquals(234, config2.intParam());
     assertEquals(1, config2.subListConfig().length);
     assertEquals("value21", config2.subListConfig()[0].stringParam());
+    //ConfigPage2 last modified date should not be updated because it is not updated
+    assertFalse(configLastModifiedUpdated(configPage2, false, lastModifiedConfigPage2));
 
     ListNestedConfig config3 = configs.get(2);
     assertEquals("value3-new", config3.stringParam());
     assertEquals(345, config3.intParam());
     assertEquals(0, config3.subListConfig().length);
+    Page configPage3 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListNestedConfig.class.getName() + "/item2");
+    //ConfigPage3 last modified date should be added because it is newly created
+    assertTrue(configLastModifiedUpdated(configPage3, true, null));
+  }
 
+  private boolean configLastModifiedUpdated(Page configPage, boolean newlyCreatedConfig, Calendar lastModifiedBeforeUpdateOrCreate) {
+    Calendar lastModifiedAfterUpdateOrCreate = configPage.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
+    if (newlyCreatedConfig) {
+      //If the config is newly created then last modified date should be updated
+      return lastModifiedAfterUpdateOrCreate != null;
+    }
+    //If the config is updated then last modified date should be updated
+    return lastModifiedAfterUpdateOrCreate != null && lastModifiedAfterUpdateOrCreate.after(lastModifiedBeforeUpdateOrCreate);
   }
 
   @Test

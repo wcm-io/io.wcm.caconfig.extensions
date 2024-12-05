@@ -28,6 +28,7 @@ import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.delet
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.ensureContainingPage;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.ensurePageIfNotContainingPage;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.getOrCreateResource;
+import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.isItemModifiedOrNewlyAdded;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.replaceProperties;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.updatePageLastMod;
 
@@ -211,9 +212,11 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
     // create new or overwrite existing children
     for (ConfigurationPersistData item : data.getItems()) {
       String path = getCollectionItemResourcePath(parentPath + "/" + item.getCollectionItemName());
-      ensureContainingPage(resolver, path, resourceType, configurationManagementSettings);
-      getOrCreateResource(resolver, path, DEFAULT_CONFIG_NODE_TYPE, item.getProperties(), configurationManagementSettings);
-      updatePageLastMod(resolver, pageManager, path);
+      if (isItemModifiedOrNewlyAdded(resolver, path, item, configurationManagementSettings)) {
+        ensureContainingPage(resolver, path, resourceType, configurationManagementSettings);
+        getOrCreateResource(resolver, path, DEFAULT_CONFIG_NODE_TYPE, item.getProperties(), configurationManagementSettings);
+        updatePageLastMod(resolver, pageManager, path);
+      }
     }
 
     // if resource collection parent properties are given replace them as well
