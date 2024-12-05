@@ -38,7 +38,6 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.api.resource.ResourceUtil;
-import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.caconfig.management.ConfigurationManagementSettings;
 import org.apache.sling.caconfig.spi.ConfigurationCollectionPersistData;
 import org.apache.sling.caconfig.spi.ConfigurationPersistData;
@@ -296,18 +295,13 @@ final class PersistenceUtils {
     if (resource == null) {
       return true; // Resource does not exist, so it is considered modified
     }
-    ValueMap valueMap = resource.getValueMap();
-    Map<String, Object> currentProperties = new HashMap<>(valueMap);
+
+    Map<String, Object> currentProperties = new HashMap<>(resource.getValueMap());
     Map<String, Object> newProperties = new HashMap<>(item.getProperties());
 
     // Filter out ignored properties
-    Set<String> currentPropertyNames = new HashSet<>(currentProperties.keySet());
-    PropertiesFilterUtil.removeIgnoredProperties(currentPropertyNames, settings);
-    currentProperties.keySet().retainAll(currentPropertyNames);
-
-    Set<String> newPropertyNames = new HashSet<>(newProperties.keySet());
-    PropertiesFilterUtil.removeIgnoredProperties(newPropertyNames, settings);
-    newProperties.keySet().retainAll(newPropertyNames);
+    PropertiesFilterUtil.removeIgnoredProperties(currentProperties, settings);
+    PropertiesFilterUtil.removeIgnoredProperties(newProperties, settings);
 
     return !currentProperties.equals(newProperties);
   }

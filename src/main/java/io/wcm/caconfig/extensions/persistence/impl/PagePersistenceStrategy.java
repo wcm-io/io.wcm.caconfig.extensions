@@ -28,9 +28,9 @@ import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.delet
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.ensureContainingPage;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.ensurePageIfNotContainingPage;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.getOrCreateResource;
+import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.isItemModifiedOrNewlyAdded;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.replaceProperties;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.updatePageLastMod;
-import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.isItemModifiedOrNewlyAdded;
 
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
