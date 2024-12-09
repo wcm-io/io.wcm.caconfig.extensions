@@ -49,6 +49,7 @@ import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.testing.mock.aem.junit5.AemContextBuilder;
 import io.wcm.testing.mock.aem.junit5.AemContextCallback;
 import io.wcm.testing.mock.aem.junit5.AemContextExtension;
+import io.wcm.wcm.commons.contenttype.ContentType;
 
 /**
  * Test the {@link ConfigurationReferenceProvider} with the {@link PagePersistenceStrategy}.
@@ -69,7 +70,9 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
       .build();
 
   private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
-  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar"));
+  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar",
+      "assetReference1", "/content/dam/test.jpg",
+      "assetReference2", "/content/dam/test.jpg"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
 
   private Resource site1PageResource;
@@ -77,10 +80,11 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @BeforeEach
   void setup() {
-
     // enable AEM page persistence strategy
     context.registerInjectActivateService(PagePersistenceStrategy.class,
         "enabled", true);
+
+    context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.JPEG);
 
     context.create().resource("/conf");
 
@@ -138,6 +142,20 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
     assertEquals(ConfigurationReferenceProvider.REFERENCE_TYPE, ref.getType());
     assertEquals("conf / global / Configuration B", ref.getName());
     assertEquals(TIMESTAMP.getTimeInMillis(), ref.getLastModified());
+  }
+
+  @Test
+  void testReferencesOfPage2_assetReferences() {
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "assetReferences", true);
+    List<Reference> references = referenceProvider.findReferences(site2PageResource);
+
+    assertReferences(references,
+        "/conf/region1/site2/sling:configs/configA",
+        "/conf/region1/sling:configs/configA",
+        "/conf/region1/site2/sling:configs/configB",
+        "/conf/global/sling:configs/configB",
+        "/content/dam/test.jpg");
   }
 
   @Test

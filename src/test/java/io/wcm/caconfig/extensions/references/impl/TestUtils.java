@@ -19,6 +19,8 @@
  */
 package io.wcm.caconfig.extensions.references.impl;
 
+import static com.day.cq.dam.api.DamConstants.ACTIVITY_TYPE_ASSET;
+import static io.wcm.caconfig.extensions.references.impl.AssetRefereneDetector.isAssetReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
@@ -61,7 +63,19 @@ final class TestUtils {
   public static void assertReferences(List<Reference> references, String... paths) {
     assertEquals(paths.length, references.size(), "number of references");
     for (int i = 0; i < paths.length; i++) {
-      assertEquals(paths[i], references.get(i).getResource().getPath(), "reference #" + i);
+      Reference reference = references.get(i);
+
+      // validate path
+      String path = reference.getResource().getPath();
+      assertEquals(paths[i], path, "reference #" + i);
+
+      // validate reference type
+      if (isAssetReference(path)) {
+        assertEquals(ACTIVITY_TYPE_ASSET, reference.getType(), "reference type #" + i);
+      }
+      else {
+        assertEquals(ConfigurationReferenceProvider.REFERENCE_TYPE, reference.getType(), "reference type #" + i);
+      }
     }
   }
 

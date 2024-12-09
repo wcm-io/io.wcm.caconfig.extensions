@@ -19,6 +19,8 @@
  */
 package io.wcm.caconfig.extensions.references.impl;
 
+import static com.day.cq.dam.api.DamConstants.ACTIVITY_TYPE_ASSET;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -48,6 +50,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.day.cq.dam.api.Asset;
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.PageFilter;
 import com.day.cq.wcm.api.PageManager;
@@ -60,8 +63,8 @@ import com.day.cq.wcm.api.reference.ReferenceProvider;
  *
  * <p>
  * This is for example used by ActivationReferenceSearchServlet to resolve referenced content of pages during activation
- * of a page using AEM sites. Returning the configurations allows the editor to activate them along with the page
- * referring to them.
+ * of a page using AEM sites. Returning the configurations and (if enabled) asset references allows the editor to activate
+ * them along with the page referring to them.
  * </p>
  *
  * <p>
@@ -73,12 +76,18 @@ import com.day.cq.wcm.api.reference.ReferenceProvider;
 public class ConfigurationReferenceProvider implements ReferenceProvider {
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Reference Provider",
-      description = "Allows to resolve references from resources to their Context-Aware configurations, for example during page activation.")
+      description = "Allows to resolve references from resources to their Context-Aware configuration pages "
+          + "and referenced assets, for example during page activation.")
   @interface Config {
 
     @AttributeDefinition(name = "Enabled",
         description = "Enable this reference provider.")
     boolean enabled() default true;
+
+    @AttributeDefinition(name = "Asset References",
+        description = "Check for asset references within the context-aware configurations, and add them to the list of references.")
+    boolean assetReferences() default false;
+
   }
 
   static final String REFERENCE_TYPE = "caconfig";
@@ -93,6 +102,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
   private ConfigurationResourceResolverConfig configurationResourceResolverConfig;
 
   private boolean enabled;
+  private boolean assetReferencesEnabled;
 
   private static final Logger log = LoggerFactory.getLogger(ConfigurationReferenceProvider.class);
 
@@ -102,6 +112,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
   @Activate
   protected void activate(Config config) {
     enabled = config.enabled();
+    assetReferencesEnabled = config.assetReferences();
   }
 
   @Deactivate
@@ -127,6 +138,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     Map<String, ConfigurationMetadata> configurationMetadatas = new TreeMap<>(configurationManager.getConfigurationNames().stream()
         .collect(Collectors.toMap(configName -> configName, configName -> configurationManager.getConfigurationMetadata(configName))));
     List<com.day.cq.wcm.api.reference.Reference> references = new ArrayList<>();
+    Map<String, Asset> referencedAssets = new TreeMap<>();
     Set<String> configurationBuckets = new LinkedHashSet<>(configurationResourceResolverConfig.configBucketNames());
 
     for (String configurationName : configurationMetadatas.keySet()) {
@@ -138,7 +150,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
         Resource configurationResource = configurationInheritanceChain.next();
 
         // get page for configuration resource - and all children (e.g. for config collections)
-        // collect in map to elimnate duplicate pages
+        // collect in map to eliminate duplicate pages
         Page configPage = pageManager.getContainingPage(configurationResource);
         if (configPage != null) {
           referencePages.put(configPage.getPath(), configPage);
@@ -152,8 +164,20 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
       // generate references for each page (but not if the context page itself is included as well)
       referencePages.values().stream()
-          .filter(item -> !StringUtils.equals(contextPage.getPath(), item.getPath()))
-          .forEach(item -> references.add(toReference(resource, item, configurationMetadatas, configurationBuckets)));
+          .filter(configPage -> !StringUtils.equals(contextPage.getPath(), configPage.getPath()))
+          .forEach(configPage -> {
+            references.add(toReference(resource, configPage, configurationMetadatas, configurationBuckets));
+            // collect asset references
+            if (assetReferencesEnabled && configPage.getContentResource() != null) {
+              AssetRefereneDetector detector = new AssetRefereneDetector(configPage);
+              detector.getReferencedAssets().stream().forEach(asset -> referencedAssets.put(asset.getPath(), asset));
+            }
+          });
+    }
+
+    if (!referencedAssets.isEmpty()) {
+      // collect asset references detected in configuration pages (de-duplicated by using a map)
+      referencedAssets.values().forEach(asset -> references.add(toReference(resource, asset)));
     }
 
     log.debug("Found {} references for resource {}", references.size(), resource.getPath());
@@ -163,10 +187,16 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
   private com.day.cq.wcm.api.reference.Reference toReference(Resource resource, Page configPage,
       Map<String, ConfigurationMetadata> configurationMetadatas, Set<String> configurationBuckets) {
     log.trace("Found configuration reference {} for resource {}", configPage.getPath(), resource.getPath());
-    return new com.day.cq.wcm.api.reference.Reference(getType(),
+    return new com.day.cq.wcm.api.reference.Reference(REFERENCE_TYPE,
         getReferenceName(configPage, configurationMetadatas, configurationBuckets),
         configPage.adaptTo(Resource.class),
         getLastModifiedOf(configPage));
+  }
+
+  private com.day.cq.wcm.api.reference.Reference toReference(Resource resource, Asset asset) {
+    log.trace("Found asset reference {} for resource {}", asset.getPath(), resource.getPath());
+    return new com.day.cq.wcm.api.reference.Reference(ACTIVITY_TYPE_ASSET,
+        asset.getName(), asset.adaptTo(Resource.class), asset.getLastModified());
   }
 
   /**
@@ -195,10 +225,6 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
   private static long getLastModifiedOf(Page page) {
     Calendar lastModified = page.getLastModified();
     return lastModified != null ? lastModified.getTimeInMillis() : 0;
-  }
-
-  private static String getType() {
-    return REFERENCE_TYPE;
   }
 
 }
