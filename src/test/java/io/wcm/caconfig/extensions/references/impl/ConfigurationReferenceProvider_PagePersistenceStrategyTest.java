@@ -79,7 +79,8 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
   void setup() {
 
     // enable AEM page persistence strategy
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class,
+        "enabled", true);
 
     context.create().resource("/conf");
 
@@ -107,8 +108,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesOfPage1() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
     assertReferences(references,
         "/conf/region1/site1/sling:configs/configA",
@@ -118,8 +118,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesOfPage2() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site2PageResource);
     assertReferences(references,
         "/conf/region1/site2/sling:configs/configA",
@@ -130,8 +129,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesProperties() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
 
     // validate props of fallback config reference
@@ -144,8 +142,8 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testDisabled() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider, "enabled", false);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "enabled", false);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
     assertTrue(references.isEmpty(), "no references");
   }

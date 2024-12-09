@@ -100,8 +100,7 @@ class ConfigurationReferenceProviderTest {
 
   @Test
   void testReferencesOfPage1() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
     // no config pages found
     assertTrue(references.isEmpty());
@@ -109,8 +108,7 @@ class ConfigurationReferenceProviderTest {
 
   @Test
   void testReferencesOfPage2() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site2PageResource);
     // no config pages found
     assertTrue(references.isEmpty());
@@ -118,8 +116,8 @@ class ConfigurationReferenceProviderTest {
 
   @Test
   void testDisabled() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider, "enabled", false);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "enabled", false);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
     assertTrue(references.isEmpty(), "no references");
   }

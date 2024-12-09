@@ -19,14 +19,15 @@
  */
 package io.wcm.caconfig.extensions.persistence.impl;
 
-import com.day.cq.wcm.api.NameConstants;
-import com.day.cq.wcm.api.Page;
-import io.wcm.caconfig.extensions.contextpath.impl.AbsoluteParentContextPathStrategy;
-import io.wcm.caconfig.extensions.persistence.example.SimpleConfig;
-import io.wcm.sling.commons.adapter.AdaptTo;
-import io.wcm.testing.mock.aem.junit5.AemContext;
-import io.wcm.testing.mock.aem.junit5.AemContextBuilder;
-import io.wcm.testing.mock.aem.junit5.AemContextExtension;
+import static io.wcm.caconfig.extensions.persistence.testcontext.PersistenceTestUtils.writeConfiguration;
+import static org.apache.sling.api.resource.ResourceResolver.PROPERTY_RESOURCE_TYPE;
+import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.Objects;
+
 import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.hamcrest.ResourceMatchers;
@@ -34,14 +35,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.Objects;
+import com.day.cq.wcm.api.NameConstants;
+import com.day.cq.wcm.api.Page;
 
-import static io.wcm.caconfig.extensions.persistence.testcontext.PersistenceTestUtils.writeConfiguration;
-import static org.apache.sling.api.resource.ResourceResolver.PROPERTY_RESOURCE_TYPE;
-import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import io.wcm.caconfig.extensions.contextpath.impl.AbsoluteParentContextPathStrategy;
+import io.wcm.caconfig.extensions.persistence.example.SimpleConfig;
+import io.wcm.sling.commons.adapter.AdaptTo;
+import io.wcm.testing.mock.aem.junit5.AemContext;
+import io.wcm.testing.mock.aem.junit5.AemContextBuilder;
+import io.wcm.testing.mock.aem.junit5.AemContextExtension;
 
 @ExtendWith(AemContextExtension.class)
 class ToolsConfigPagePersistenceStrategyWithCustomRelativeConfigPathTest {
@@ -54,11 +56,11 @@ class ToolsConfigPagePersistenceStrategyWithCustomRelativeConfigPathTest {
 
   @BeforeEach
   void setUp() {
-    context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
             "levels", new int[] { 1, 3 },
             "contextPathRegex", "^/content(/.+)$",
             "configPathPatterns", new String[] { "/conf$1", "/content$1/tools/other-config/jcr:content" });
-    context.registerInjectActivateService(new ToolsConfigPagePersistenceStrategy(),
+    context.registerInjectActivateService(ToolsConfigPagePersistenceStrategy.class,
             "enabled", true,
             "configPageTemplate", "/apps/app1/templates/configEditor",
             "structurePageTemplate", "/apps/app1/templates/structurePage",
