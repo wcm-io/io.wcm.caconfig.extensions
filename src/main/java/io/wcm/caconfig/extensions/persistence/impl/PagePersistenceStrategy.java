@@ -28,6 +28,7 @@ import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.delet
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.ensureContainingPage;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.ensurePageIfNotContainingPage;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.getOrCreateResource;
+import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.isItemModifiedOrNewlyAdded;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.replaceProperties;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.updatePageLastMod;
 
@@ -56,6 +57,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * AEM-specific persistence strategy that has higher precedence than the default strategy from Sling,
  * but lower precedence that the persistence strategy that is part of AEM since version 6.3.
+ *
  * <p>
  * It supports reading configurations from cq:Page nodes in /conf, the configuration is read from the jcr:content child
  * node. Unlike the persistence strategy in AEM 6.3 this also supports writing configuration to /conf.
@@ -210,9 +212,11 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
     // create new or overwrite existing children
     for (ConfigurationPersistData item : data.getItems()) {
       String path = getCollectionItemResourcePath(parentPath + "/" + item.getCollectionItemName());
-      ensureContainingPage(resolver, path, resourceType, configurationManagementSettings);
-      getOrCreateResource(resolver, path, DEFAULT_CONFIG_NODE_TYPE, item.getProperties(), configurationManagementSettings);
-      updatePageLastMod(resolver, pageManager, path);
+      if (isItemModifiedOrNewlyAdded(resolver, path, item, configurationManagementSettings)) {
+        ensureContainingPage(resolver, path, resourceType, configurationManagementSettings);
+        getOrCreateResource(resolver, path, DEFAULT_CONFIG_NODE_TYPE, item.getProperties(), configurationManagementSettings);
+        updatePageLastMod(resolver, pageManager, path);
+      }
     }
 
     // if resource collection parent properties are given replace them as well
