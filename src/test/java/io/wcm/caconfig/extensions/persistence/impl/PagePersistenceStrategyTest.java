@@ -89,7 +89,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testSimpleConfig() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
     // write config
     writeConfiguration(context, contentPage.getPath(), SimpleConfig.class.getName(),
@@ -115,7 +115,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testSimpleConfig_Disabled() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", false);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", false);
 
     // write config
     writeConfiguration(context, contentPage.getPath(), SimpleConfig.class.getName(),
@@ -134,7 +134,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testListConfig() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
@@ -167,7 +167,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testListConfig_updateLastModifiedIfPropertyRemoved() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
@@ -197,7 +197,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testListConfig_Nested() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
@@ -293,7 +293,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testNestedConfig() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
     // write config
     writeConfiguration(context, contentPage.getPath(), NestedConfig.class.getName(),
@@ -332,7 +332,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testDeeplyNestedConfig_WCON60() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), FooterConfig.class.getName() + "/jcr:content/menu/menu1/links", List.of(
@@ -359,7 +359,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testSimpleConfig_ResourceType() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true,
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
         "resourceType", "app1/components/page/config");
 
     // write config
@@ -376,7 +376,7 @@ class PagePersistenceStrategyTest {
 
   @Test
   void testListConfig_ResourceType() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true,
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
         "resourceType", "app1/components/page/config");
 
     // write config

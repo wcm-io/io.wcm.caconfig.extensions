@@ -72,11 +72,11 @@ class ToolsConfigPagePersistenceStrategyTest {
 
   @BeforeEach
   void setUp() {
-    context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
         "levels", new int[] { 1, 3 },
         "contextPathRegex", "^/content(/.+)$",
         "configPathPatterns", new String[] { "/conf$1", "/content$1/tools/config/jcr:content" });
-    context.registerInjectActivateService(new ToolsConfigPagePersistenceStrategy(),
+    context.registerInjectActivateService(ToolsConfigPagePersistenceStrategy.class,
         "enabled", true,
         "configPageTemplate", "/apps/app1/templates/configEditor",
         "structurePageTemplate", "/apps/app1/templates/structurePage");
@@ -165,7 +165,7 @@ class ToolsConfigPagePersistenceStrategyTest {
 
   @Test
   void testListConfig_Nested() {
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(

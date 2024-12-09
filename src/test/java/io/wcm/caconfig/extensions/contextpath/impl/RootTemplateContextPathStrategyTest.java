@@ -56,14 +56,14 @@ class RootTemplateContextPathStrategyTest {
 
   @Test
   void testWithInvalidConfig() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new RootTemplateContextPathStrategy());
+    ContextPathStrategy underTest = context.registerInjectActivateService(RootTemplateContextPathStrategy.class);
 
     assertNoResult(context, underTest.findContextResources(level4));
   }
 
   @Test
   void testWithTemplate() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new RootTemplateContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(RootTemplateContextPathStrategy.class,
         "templatePaths", new String[] { TEMPLATE_1 });
 
     assertResult(context, underTest.findContextResources(level4),
@@ -84,7 +84,7 @@ class RootTemplateContextPathStrategyTest {
 
   @Test
   void testWithAlternativePatterns() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new RootTemplateContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(RootTemplateContextPathStrategy.class,
         "templatePaths", new String[] { TEMPLATE_1 },
         "contextPathRegex", "^(/content/.+)$",
         "configPathPatterns", new String[] { "/conf/test1$1", "/conf/test2$1" });
@@ -98,7 +98,7 @@ class RootTemplateContextPathStrategyTest {
 
   @Test
   void testWithTemplate_TemplatMatchAllLevels() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new RootTemplateContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(RootTemplateContextPathStrategy.class,
         "templatePaths", new String[] { TEMPLATE_1, TEMPLATE_2 },
         "templateMatchAllLevels", true);
 

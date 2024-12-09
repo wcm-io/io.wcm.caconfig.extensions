@@ -53,14 +53,14 @@ class AbsoluteParentContextPathStrategyTest {
 
   @Test
   void testWithInvalidConfig() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new AbsoluteParentContextPathStrategy());
+    ContextPathStrategy underTest = context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class);
 
     assertNoResult(context, underTest.findContextResources(level4));
   }
 
   @Test
   void testWithLevels13() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
         "levels", new int[] { 1, 3 });
 
     assertResult(context, underTest.findContextResources(level4),
@@ -80,7 +80,7 @@ class AbsoluteParentContextPathStrategyTest {
 
   @Test
   void testWithLevels13_Unlimited() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
         "levels", new int[] { 1, 3 },
         "unlimited", true);
 
@@ -102,7 +102,7 @@ class AbsoluteParentContextPathStrategyTest {
 
   @Test
   void testWithLevels1_Unlimited() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
         "levels", new int[] { 1 },
         "unlimited", true);
 
@@ -127,7 +127,7 @@ class AbsoluteParentContextPathStrategyTest {
 
   @Test
   void testWithAlternativePatterns() {
-    ContextPathStrategy underTest = context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
         "levels", new int[] { 1, 3 },
         "contextPathRegex", "^(/content/.+)$",
         "contextPathBlacklistRegex", "^.*/region\\d+?$",
@@ -148,7 +148,7 @@ class AbsoluteParentContextPathStrategyTest {
     Resource level3Config = context.create().page("/content/region1/site1/en/config").getContentResource();
     Resource level4Config = context.create().page("/content/region1/site1/en/page1/config").getContentResource();
 
-    ContextPathStrategy underTest = context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
         "levels", new int[] { 1, 3 },
         "contextPathBlacklistRegex", "^.*/config(/.+)?$");
 
@@ -177,7 +177,7 @@ class AbsoluteParentContextPathStrategyTest {
     Resource level3Config = context.create().page("/content/region1/site1/en/other-config", "/apps/myapp/templates/caconfig-editor").getContentResource();
     Resource level4Config = context.create().page("/content/region1/site1/en/page1/lastconfig", "/apps/myapp/templates/caconfig-editor").getContentResource();
 
-    ContextPathStrategy underTest = context.registerInjectActivateService(new AbsoluteParentContextPathStrategy(),
+    ContextPathStrategy underTest = context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
         "levels", new int[] { 1, 3 },
         "contextPathBlacklistRegex", "^.*/config(/.+)?$", // this is not matching
         "templatePathsBlacklist", new String[] { "/apps/myapp/templates/caconfig-editor" });
