@@ -70,7 +70,9 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
       .build();
 
   private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
-  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar", "imageIcon", "/content/dam/test.jpg"));
+  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar",
+      "assetReference1", "/content/dam/test.jpg",
+      "assetReference2", "/content/dam/test.jpg"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
 
   private Resource site1PageResource;
@@ -78,10 +80,11 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @BeforeEach
   void setup() {
-
     // enable AEM page persistence strategy
     context.registerInjectActivateService(PagePersistenceStrategy.class,
         "enabled", true);
+
+    context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.JPEG);
 
     context.create().resource("/conf");
 
@@ -143,7 +146,6 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesOfPage2_assetReferences() {
-    context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.JPEG);
     ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
         "assetReferences", true);
     List<Reference> references = referenceProvider.findReferences(site2PageResource);
@@ -154,9 +156,6 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
         "/conf/region1/site2/sling:configs/configB",
         "/conf/global/sling:configs/configB",
         "/content/dam/test.jpg");
-    boolean hasAssetReference = references.stream()
-            .anyMatch(ref -> ref.getType().equals("asset") && ref.getResource().getPath().startsWith("/content/dam/"));
-    assertTrue(hasAssetReference, "Asset references are present");
   }
 
   @Test

@@ -46,6 +46,7 @@ import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.testing.mock.aem.junit5.AemContextBuilder;
 import io.wcm.testing.mock.aem.junit5.AemContextCallback;
 import io.wcm.testing.mock.aem.junit5.AemContextExtension;
+import io.wcm.wcm.commons.contenttype.ContentType;
 
 /**
  * Test the {@link ConfigurationReferenceProvider} with the Sling CAConfig default persistence.
@@ -66,7 +67,9 @@ class ConfigurationReferenceProviderTest {
       .build();
 
   private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
-  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar"));
+  private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar",
+      "assetReference1", "/content/dam/test.jpg",
+      "assetReference2", "/content/dam/test.jpg"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
 
   private Resource site1PageResource;
@@ -74,6 +77,8 @@ class ConfigurationReferenceProviderTest {
 
   @BeforeEach
   void setup() {
+    context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.JPEG);
+
     context.create().resource("/conf");
 
     context.create().page("/content/region1", null, Map.of("sling:configRef", "/conf/region1"));
