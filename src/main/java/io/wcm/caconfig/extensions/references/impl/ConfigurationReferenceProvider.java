@@ -76,7 +76,8 @@ import com.day.cq.wcm.api.reference.ReferenceProvider;
 public class ConfigurationReferenceProvider implements ReferenceProvider {
 
   @ObjectClassDefinition(name = "wcm.io Context-Aware Configuration Reference Provider",
-      description = "Allows to resolve references from resources to their Context-Aware configurations & assets, for example during page activation.")
+      description = "Allows to resolve references from resources to their Context-Aware configuration pages "
+          + "and referenced assets, for example during page activation.")
   @interface Config {
 
     @AttributeDefinition(name = "Enabled",
