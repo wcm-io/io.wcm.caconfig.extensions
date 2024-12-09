@@ -24,6 +24,7 @@ import static com.day.cq.dam.api.DamConstants.ACTIVITY_TYPE_ASSET;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -40,6 +41,8 @@ import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.caconfig.management.ConfigurationResourceResolverConfig;
 import org.apache.sling.caconfig.management.multiplexer.ConfigurationResourceResolvingStrategyMultiplexer;
 import org.apache.sling.caconfig.spi.metadata.ConfigurationMetadata;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -144,26 +147,12 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     for (String configurationName : configurationMetadatas.keySet()) {
       Iterator<Resource> configurationInheritanceChain = configurationResourceResolvingStrategy.getResourceInheritanceChain(resource, configurationBuckets,
           configurationName);
-      Map<String, Page> referencePages = new LinkedHashMap<>();
 
-      while (configurationInheritanceChain != null && configurationInheritanceChain.hasNext()) {
-        Resource configurationResource = configurationInheritanceChain.next();
-
-        // get page for configuration resource - and all children (e.g. for config collections)
-        // collect in map to eliminate duplicate pages
-        Page configPage = pageManager.getContainingPage(configurationResource);
-        if (configPage != null) {
-          referencePages.put(configPage.getPath(), configPage);
-          Iterator<Page> deepChildren = configPage.listChildren(new PageFilter(false, true), true);
-          while (deepChildren.hasNext()) {
-            Page configChildPage = deepChildren.next();
-            referencePages.put(configChildPage.getPath(), configChildPage);
-          }
-        }
-      }
+      // get all configuration pages from inheritance chain
+      Collection<Page> referencePages = getReferencePages(configurationInheritanceChain, pageManager);
 
       // generate references for each page (but not if the context page itself is included as well)
-      referencePages.values().stream()
+      referencePages.stream()
           .filter(configPage -> !StringUtils.equals(contextPage.getPath(), configPage.getPath()))
           .forEach(configPage -> {
             references.add(toReference(resource, configPage, configurationMetadatas, configurationBuckets));
@@ -182,6 +171,26 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
     log.debug("Found {} references for resource {}", references.size(), resource.getPath());
     return references;
+  }
+
+  private Collection<Page> getReferencePages(@Nullable Iterator<Resource> configurationInheritanceChain, @NotNull PageManager pageManager) {
+    Map<String, Page> referencePages = new LinkedHashMap<>();
+    while (configurationInheritanceChain != null && configurationInheritanceChain.hasNext()) {
+      Resource configurationResource = configurationInheritanceChain.next();
+
+      // get page for configuration resource - and all children (e.g. for config collections)
+      // collect in map to eliminate duplicate pages
+      Page configPage = pageManager.getContainingPage(configurationResource);
+      if (configPage != null) {
+        referencePages.put(configPage.getPath(), configPage);
+        Iterator<Page> deepChildren = configPage.listChildren(new PageFilter(false, true), true);
+        while (deepChildren.hasNext()) {
+          Page configChildPage = deepChildren.next();
+          referencePages.put(configChildPage.getPath(), configChildPage);
+        }
+      }
+    }
+    return referencePages.values();
   }
 
   private com.day.cq.wcm.api.reference.Reference toReference(Resource resource, Page configPage,
