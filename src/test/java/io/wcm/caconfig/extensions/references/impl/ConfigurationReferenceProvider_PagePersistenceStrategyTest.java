@@ -30,7 +30,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import io.wcm.wcm.commons.contenttype.ContentType;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.wrappers.ValueMapDecorator;
@@ -50,6 +49,7 @@ import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.testing.mock.aem.junit5.AemContextBuilder;
 import io.wcm.testing.mock.aem.junit5.AemContextCallback;
 import io.wcm.testing.mock.aem.junit5.AemContextExtension;
+import io.wcm.wcm.commons.contenttype.ContentType;
 
 /**
  * Test the {@link ConfigurationReferenceProvider} with the {@link PagePersistenceStrategy}.
@@ -80,7 +80,8 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
   void setup() {
 
     // enable AEM page persistence strategy
-    context.registerInjectActivateService(new PagePersistenceStrategy(), "enabled", true);
+    context.registerInjectActivateService(PagePersistenceStrategy.class,
+        "enabled", true);
 
     context.create().resource("/conf");
 
@@ -108,8 +109,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesOfPage1() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
     assertReferences(references,
         "/conf/region1/site1/sling:configs/configA",
@@ -119,8 +119,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesOfPage2() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site2PageResource);
     assertReferences(references,
         "/conf/region1/site2/sling:configs/configA",
@@ -131,8 +130,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testReferencesProperties() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
 
     // validate props of fallback config reference
@@ -146,15 +144,16 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
   @Test
   void testReferencesOfPage2_assetReferences() {
     context.create().asset("/content/dam/test.jpg", 10, 10, ContentType.JPEG);
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "assetReferences", true);
     List<Reference> references = referenceProvider.findReferences(site2PageResource);
 
     assertReferences(references,
-            "/conf/region1/site2/sling:configs/configA",
-            "/conf/region1/sling:configs/configA",
-            "/conf/region1/site2/sling:configs/configB",
-            "/conf/global/sling:configs/configB", "/content/dam/test.jpg");
+        "/conf/region1/site2/sling:configs/configA",
+        "/conf/region1/sling:configs/configA",
+        "/conf/region1/site2/sling:configs/configB",
+        "/conf/global/sling:configs/configB",
+        "/content/dam/test.jpg");
     boolean hasAssetReference = references.stream()
             .anyMatch(ref -> ref.getType().equals("asset") && ref.getResource().getPath().startsWith("/content/dam/"));
     assertTrue(hasAssetReference, "Asset references are present");
@@ -162,8 +161,8 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   @Test
   void testDisabled() {
-    ReferenceProvider referenceProvider = new ConfigurationReferenceProvider();
-    context.registerInjectActivateService(referenceProvider, "enabled", false);
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "enabled", false);
     List<Reference> references = referenceProvider.findReferences(site1PageResource);
     assertTrue(references.isEmpty(), "no references");
   }
