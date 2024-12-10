@@ -23,6 +23,16 @@
     xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/plugins/maven-changes-plugin/xsd/changes-1.0.0.xsd">
   <body>
 
+    <release version="1.10.0" date="2024-12-10">
+      <action type="add" dev="srikanthgurram" issue="7">
+        Configuration Reference Provider: Check for asset reference contained in the Context-Aware configurations and add them to the list of reference to check for publication.
+        This feature is disabled by default, and can be enabled by OSGi configuration.
+      </action>
+      <action type="fix" dev="srikanthgurram" issue="8">
+        Saving of Context-Aware configuration collections: Update last modified date of item pages only if the configuration of it has actually changed.
+      </action>
+    </release>
+
     <release version="1.9.6" date="2024-07-08">
       <action type="update" dev="cnagel" issue="4">
         Adds context path allow list to ToolsConfigPagePersistenceStrategy configuration.

@@ -29,7 +29,7 @@ class PagePersistenceStrategyTestWithToolsConfigPage extends PagePersistenceStra
 
   @BeforeEach
   void registerAdditionalPersictenceStrategy() {
-    context.registerInjectActivateService(new ToolsConfigPagePersistenceStrategy(),
+    context.registerInjectActivateService(ToolsConfigPagePersistenceStrategy.class,
         "enabled", true);
   }
 

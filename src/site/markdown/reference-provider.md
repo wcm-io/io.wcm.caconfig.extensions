@@ -20,6 +20,13 @@ To disable it configure:
     enabled=B"false"
 ```
 
+Optionally, you can detect also asset references stored in the context-aware configuration pages, and include them in the publication check:
+
+```
+  io.wcm.caconfig.extensions.references.impl.ConfigurationReferenceProvider
+    enabled=B"true"
+    assetReferences=B"true"
+```
 
 
 [aem-referenceprovider]: https://docs.adobe.com/docs/en/aem/6-3/develop/ref/javadoc/com/day/cq/wcm/api/reference/ReferenceProvider.html

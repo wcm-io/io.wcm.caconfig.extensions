@@ -26,4 +26,8 @@ import org.apache.sling.caconfig.annotation.Configuration;
 
   String key() default "";
 
+  String assetReference1() default "";
+
+  String assetReference2() default "";
+
 }

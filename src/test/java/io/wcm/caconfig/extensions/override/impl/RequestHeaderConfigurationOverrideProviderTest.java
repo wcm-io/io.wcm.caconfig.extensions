@@ -69,7 +69,7 @@ class RequestHeaderConfigurationOverrideProviderTest {
 
   @Test
   void testEnabled() {
-    RequestHeaderConfigurationOverrideProvider provider = context.registerInjectActivateService(new RequestHeaderConfigurationOverrideProvider(),
+    RequestHeaderConfigurationOverrideProvider provider = context.registerInjectActivateService(RequestHeaderConfigurationOverrideProvider.class,
         "enabled", true,
         "headerName", HEADER_NAME);
 
@@ -81,7 +81,7 @@ class RequestHeaderConfigurationOverrideProviderTest {
 
   @Test
   void testDisabled() {
-    RequestHeaderConfigurationOverrideProvider provider = context.registerInjectActivateService(new RequestHeaderConfigurationOverrideProvider(),
+    RequestHeaderConfigurationOverrideProvider provider = context.registerInjectActivateService(RequestHeaderConfigurationOverrideProvider.class,
         "enabled", false);
 
     assertTrue(provider.getOverrideStrings().isEmpty());
