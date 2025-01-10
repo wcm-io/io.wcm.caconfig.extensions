@@ -196,8 +196,11 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testListConfig_Nested() {
-    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
+  @SuppressWarnings("java:S2925") // allow thread.sleep
+  void testListConfig_Nested() throws InterruptedException {
+    context.registerInjectActivateService(PagePersistenceStrategy.class,
+        "enabled", true,
+        "collectionMarkAllItemsUpdated", false);
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
@@ -240,9 +243,10 @@ class PagePersistenceStrategyTest {
     assertEquals(1, config2.subListConfig().length);
     assertEquals("value21", config2.subListConfig()[0].stringParam());
 
+    Calendar lastModifiedConfigPage1 = getJcrLastModified(configPage1);
+    Calendar lastModifiedConfigPage2 = getJcrLastModified(configPage2);
 
-    Calendar lastModifiedConfigPage1 = configPage1.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
-    Calendar lastModifiedConfigPage2 = configPage2.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
+    Thread.sleep(10); // ensure that last modified date is different
 
     // update config collection items
     writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
@@ -281,8 +285,56 @@ class PagePersistenceStrategyTest {
     assertTrue(configLastModifiedUpdated(configPage3, true, null));
   }
 
+  /**
+   * Same as testListConfig_Nested, but testing only the changed behavior of updating lastmod of all collection items.
+   */
+  @Test
+  @SuppressWarnings("java:S2925") // allow thread.sleep
+  void testListConfig_Nested_collectionMarkAllItemsUpdated() throws InterruptedException {
+    context.registerInjectActivateService(PagePersistenceStrategy.class,
+        "enabled", true,
+        "collectionMarkAllItemsUpdated", true);
+
+    // write config
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
+        ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+        ImmutableValueMap.of("stringParam", "value2", "intParam", 234)));
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName() + "/item0/jcr:content/subListConfig", List.of(
+        ImmutableValueMap.of("stringParam", "value11"),
+        ImmutableValueMap.of("stringParam", "value12")));
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName() + "/item1/jcr:content/subListConfig", List.of(
+        ImmutableValueMap.of("stringParam", "value21")));
+
+    // get last modified
+    Page configPage1 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListNestedConfig.class.getName() + "/item0");
+    Page configPage2 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListNestedConfig.class.getName() + "/item1");
+    Calendar lastModifiedConfigPage1 = getJcrLastModified(configPage1);
+    Calendar lastModifiedConfigPage2 = getJcrLastModified(configPage2);
+
+    Thread.sleep(10); // ensure that last modified date is different
+
+    // update config collection items
+    writeConfigurationCollection(context, contentPage.getPath(), ListNestedConfig.class.getName(), List.of(
+        ImmutableValueMap.of("stringParam", "value1-new", "intParam", 123),
+        ImmutableValueMap.of("stringParam", "value2", "intParam", 234),
+        ImmutableValueMap.of("stringParam", "value3-new", "intParam", 345)));
+
+    //ConfigPage1 last modified date should be always updated
+    assertTrue(configLastModifiedUpdated(configPage1, false, lastModifiedConfigPage1));
+    //ConfigPage2 last modified date should be always updated
+    assertTrue(configLastModifiedUpdated(configPage2, false, lastModifiedConfigPage2));
+
+    Page configPage3 = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListNestedConfig.class.getName() + "/item2");
+    //ConfigPage3 last modified date should be always updated
+    assertTrue(configLastModifiedUpdated(configPage3, true, null));
+  }
+
+  private Calendar getJcrLastModified(Page page) {
+    return page.getProperties().get(PN_LAST_MOD, Calendar.class);
+  }
+
   private boolean configLastModifiedUpdated(Page configPage, boolean newlyCreatedConfig, Calendar lastModifiedBeforeUpdateOrCreate) {
-    Calendar lastModifiedAfterUpdateOrCreate = configPage.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
+    Calendar lastModifiedAfterUpdateOrCreate = getJcrLastModified(configPage);
     if (newlyCreatedConfig) {
       //If the config is newly created then last modified date should be updated
       return lastModifiedAfterUpdateOrCreate != null;
