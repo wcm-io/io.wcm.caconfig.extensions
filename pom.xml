@@ -25,13 +25,13 @@
   <parent>
     <groupId>io.wcm</groupId>
     <artifactId>io.wcm.parent_toplevel</artifactId>
-    <version>2.3.4</version>
+    <version>2.4.4</version>
     <relativePath/>
   </parent>
 
   <groupId>io.wcm</groupId>
   <artifactId>io.wcm.caconfig.extensions</artifactId>
-  <version>1.10.0</version>
+  <version>1.10.2</version>
   <packaging>jar</packaging>
 
   <name>Context-Aware Configuration Extensions for AEM</name>
@@ -49,7 +49,7 @@
     <site.url.module.prefix>caconfig/extensions</site.url.module.prefix>
 
     <!-- Enable reproducible builds -->
-    <project.build.outputTimestamp>2024-12-10T08:14:11Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-01-13T09:48:51Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>

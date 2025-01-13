@@ -51,7 +51,7 @@ Sources: https://github.com/wcm-io/io.wcm.caconfig.extensions
 
 
 [usage]: usage.html
-[changelog]: changes-report.html
+[changelog]: changes.html
 [context-path-strategies]: context-path-strategies.html
 [persistence-strategies]: persistence-strategies.html
 [override-providers]: override-providers.html
