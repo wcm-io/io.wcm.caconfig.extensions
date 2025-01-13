@@ -24,7 +24,7 @@
     xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
   <body>
 
-    <release version="1.10.2" date="not released">
+    <release version="1.10.2" date="2025-01-13">
       <action type="fix" dev="sseifert" issue="9">
         AEM Page persistence strategy: Saving of Context-Aware configuration collections - restore previous behavior of setting last modified date of all items regardless of actual data changes or not.
         Introduce a new OSGi configuration property collectionMarkAllItemsUpdated attached to the backward-compatible behavior set to true by default.
