@@ -24,13 +24,21 @@
     xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
   <body>
 
+    <release version="1.10.2" date="not released">
+      <action type="fix" dev="sseifert" issue="9">
+        AEM Page persistence strategy: Saving of Context-Aware configuration collections - restore previous behavior of setting last modified date of all items regardless of actual data changes or not.
+        Introduce a new OSGi configuration property collectionMarkAllItemsUpdated attached to the backward-compatible behavior set to true by default.
+        If set to false, the new behavior of is applied. But this new behavior with updating last modified only on the affected items seems to create problems with publishing in AEMaaCS cloud instances.
+      </action>
+    </release>
+
     <release version="1.10.0" date="2024-12-10">
       <action type="add" dev="srikanthgurram" issue="7">
         Configuration Reference Provider: Check for asset reference contained in the Context-Aware configurations and add them to the list of reference to check for publication.
         This feature is disabled by default, and can be enabled by OSGi configuration.
       </action>
       <action type="fix" dev="srikanthgurram" issue="8">
-        Saving of Context-Aware configuration collections: Update last modified date of item pages only if the configuration of it has actually changed.
+        AEM Page persistence strategy: Saving of Context-Aware configuration collections - update last modified date of item pages only if the configuration of it has actually changed.
       </action>
     </release>
 

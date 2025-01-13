@@ -79,6 +79,10 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
         description = "Resource type for configuration pages.")
     String resourceType();
 
+    @AttributeDefinition(name = "Collection: Mark all items updated",
+        description = "When modifying a single collection item, mark all items in the collection as updated. This is a workaround for a problem publishing collections in AEMaaCS.")
+    boolean collectionMarkAllItemsUpdated() default true;
+
     @AttributeDefinition(name = "Service Ranking",
         description = "Priority of persistence strategy (higher = higher priority).")
     int service_ranking() default 1500;
@@ -94,11 +98,13 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
 
   private boolean enabled;
   private String resourceType;
+  private boolean collectionMarkAllItemsUpdated;
 
   @Activate
-  void activate(Config value) {
-    this.enabled = value.enabled();
-    this.resourceType = value.resourceType();
+  void activate(Config config) {
+    this.enabled = config.enabled();
+    this.resourceType = config.resourceType();
+    this.collectionMarkAllItemsUpdated = config.collectionMarkAllItemsUpdated();
   }
 
   @Override
@@ -212,7 +218,7 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
     // create new or overwrite existing children
     for (ConfigurationPersistData item : data.getItems()) {
       String path = getCollectionItemResourcePath(parentPath + "/" + item.getCollectionItemName());
-      if (isItemModifiedOrNewlyAdded(resolver, path, item, configurationManagementSettings)) {
+      if (collectionMarkAllItemsUpdated || isItemModifiedOrNewlyAdded(resolver, path, item, configurationManagementSettings)) {
         ensureContainingPage(resolver, path, resourceType, configurationManagementSettings);
         getOrCreateResource(resolver, path, DEFAULT_CONFIG_NODE_TYPE, item.getProperties(), configurationManagementSettings);
         updatePageLastMod(resolver, pageManager, path);
