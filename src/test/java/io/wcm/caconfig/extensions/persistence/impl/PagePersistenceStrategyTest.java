@@ -34,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.hamcrest.ResourceMatchers;
@@ -451,6 +453,31 @@ class PagePersistenceStrategyTest {
     assertThat(configPage2.getContentResource(), ResourceMatchers.props("stringParam", "value2", "intParam", 234));
     assertThat(configPage2.getContentResource(), ResourceMatchers.props(PROPERTY_RESOURCE_TYPE, "app1/components/page/config"));
 
+  }
+
+  @Test
+  void testDeniedConfigName() {
+    String configName = "deniedConfigName";
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
+        "configNameDenyList", new String[] { configName });
+
+    // write config
+    writeConfiguration(context, contentPage.getPath(), configName,
+        "siteTemplatePath", "/mypath");
+
+    // assert storage in page in /conf
+    Resource configResource = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + configName);
+    assertThat(configResource, ResourceMatchers.props("siteTemplatePath", "/mypath"));
+
+    // read config
+    ValueMap configMap = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).name(configName).asValueMap();
+    assertEquals("/mypath", configMap.get("siteTemplatePath", String.class));
+
+    // delete
+    ConfigurationManager configManager = context.getService(ConfigurationManager.class);
+    configManager.deleteConfiguration(contentPage.getContentResource(), configName);
+    configMap = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).name(configName).asValueMap();
+    assertNull(configMap.get("siteTemplatePath", String.class));
   }
 
 }
