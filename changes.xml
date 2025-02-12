@@ -25,7 +25,7 @@
   <body>
 
     <release version="1.10.4" date="not released">
-      <action type="update" dev="sseifert">
+      <action type="update" dev="sseifert" issue="11">
         AEM Page persistence strategy: Add OSGi configuration property "Config Name Deny List" which allows to configure a list of configuration names that should not be persisted as AEM pages.
         By default, this contains the configuration name com.adobe.aem.wcm.site.manager.config.SiteConfig, which is accessed internally by AEM using JCR queries and assuming a simplified persistence structure.
       </action>
