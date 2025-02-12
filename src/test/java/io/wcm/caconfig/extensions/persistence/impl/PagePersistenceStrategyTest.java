@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
@@ -456,28 +457,56 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  void testDeniedConfigName() {
+  void testSimpleConfig_DeniedConfigName() {
     String configName = "deniedConfigName";
     context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
         "configNameDenyList", new String[] { configName });
 
     // write config
     writeConfiguration(context, contentPage.getPath(), configName,
-        "siteTemplatePath", "/mypath");
+        "param1", "value1");
 
     // assert storage in page in /conf
     Resource configResource = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + configName);
-    assertThat(configResource, ResourceMatchers.props("siteTemplatePath", "/mypath"));
+    assertThat(configResource, ResourceMatchers.props("param1", "value1"));
 
     // read config
     ValueMap configMap = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).name(configName).asValueMap();
-    assertEquals("/mypath", configMap.get("siteTemplatePath", String.class));
+    assertEquals("value1", configMap.get("param1", String.class));
 
     // delete
     ConfigurationManager configManager = context.getService(ConfigurationManager.class);
     configManager.deleteConfiguration(contentPage.getContentResource(), configName);
     configMap = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).name(configName).asValueMap();
-    assertNull(configMap.get("siteTemplatePath", String.class));
+    assertNull(configMap.get("param1", String.class));
   }
 
+  @Test
+  void testListConfig_DeniedConfigName() {
+    String configName = "deniedListConfigName";
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
+        "configNameDenyList", new String[] { configName });
+
+    // write config
+    writeConfigurationCollection(context, contentPage.getPath(), configName, List.of(
+        ImmutableValueMap.of("stringParam", "value1"),
+        ImmutableValueMap.of("stringParam", "value2"), Map.of()));
+
+    // assert storage in page in /conf
+    Resource parentResource = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + configName);
+    assertNotNull(parentResource);
+
+    Resource configResource1 = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + configName + "/item0");
+    assertThat(configResource1, ResourceMatchers.props("stringParam", "value1"));
+
+    Resource configResource2 = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + configName + "/item1");
+    assertThat(configResource2, ResourceMatchers.props("stringParam", "value2"));
+
+    // read config
+    List<ValueMap> configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).name(configName).asValueMapCollection());
+    ValueMap config1 = configs.get(0);
+    assertEquals("value1", config1.get("stringParam", String.class));
+    ValueMap config2 = configs.get(1);
+    assertEquals("value2", config2.get("stringParam", String.class));
+  }
 }
