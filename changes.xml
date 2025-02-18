@@ -24,6 +24,13 @@
     xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
   <body>
 
+    <release version="1.10.4" date="not released">
+      <action type="update" dev="sseifert" issue="11">
+        AEM Page persistence strategy: Add OSGi configuration property "Config Name Deny List" which allows to configure a list of configuration names that should not be persisted as AEM pages.
+        By default, this contains the configuration name com.adobe.aem.wcm.site.manager.config.SiteConfig, which is accessed internally by AEM using JCR queries and assuming a simplified persistence structure.
+      </action>
+    </release>
+
     <release version="1.10.2" date="2025-01-13">
       <action type="fix" dev="sseifert" issue="9">
         AEM Page persistence strategy: Saving of Context-Aware configuration collections - restore previous behavior of setting last modified date of all items regardless of actual data changes or not.
