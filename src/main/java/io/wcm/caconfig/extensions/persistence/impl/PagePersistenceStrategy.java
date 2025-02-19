@@ -32,8 +32,12 @@ import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.isIte
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.replaceProperties;
 import static io.wcm.caconfig.extensions.persistence.impl.PersistenceUtils.updatePageLastMod;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.ResourceUtil;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.caconfig.management.ConfigurationManagementSettings;
 import org.apache.sling.caconfig.spi.ConfigurationCollectionPersistData;
@@ -87,6 +91,13 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
         description = "Priority of persistence strategy (higher = higher priority).")
     int service_ranking() default 1500;
 
+    @AttributeDefinition(name = "Config Name Deny List",
+        description = "List of context-aware configuration names this persistence implementation should ignore.")
+    String[] configNameDenyList() default {
+        // ignore because AEM uses JCR query to fetch config values, assuming a different persistence structure
+        "com.adobe.aem.wcm.site.manager.config.SiteConfig"
+    };
+
   }
 
   private static final String DEFAULT_CONFIG_NODE_TYPE = NT_UNSTRUCTURED;
@@ -99,12 +110,14 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
   private boolean enabled;
   private String resourceType;
   private boolean collectionMarkAllItemsUpdated;
+  private Set<String> configNameDenyList;
 
   @Activate
   void activate(Config config) {
     this.enabled = config.enabled();
     this.resourceType = config.resourceType();
     this.collectionMarkAllItemsUpdated = config.collectionMarkAllItemsUpdated();
+    this.configNameDenyList = Set.copyOf(Arrays.asList(config.configNameDenyList()));
   }
 
   @Override
@@ -157,7 +170,7 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
 
   @Override
   public String getConfigName(@NotNull String configName, @Nullable String relatedConfigPath) {
-    if (!enabled) {
+    if (!enabled && isConfigNameDenied(configName)) {
       return null;
     }
     if (containsJcrContent(configName)) {
@@ -168,7 +181,7 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
 
   @Override
   public String getCollectionParentConfigName(@NotNull String configName, @Nullable String relatedConfigPath) {
-    if (!enabled) {
+    if (!enabled && isConfigNameDenied(configName)) {
       return null;
     }
     return configName;
@@ -182,7 +195,7 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
   @Override
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public boolean persistConfiguration(@NotNull ResourceResolver resolver, @NotNull String configResourcePath, @NotNull ConfigurationPersistData data) {
-    if (!enabled) {
+    if (!enabled || isConfigResourcePathDenied(configResourcePath)) {
       return false;
     }
     String path = getResourcePath(configResourcePath);
@@ -200,7 +213,7 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public boolean persistConfigurationCollection(@NotNull ResourceResolver resolver, @NotNull String configResourceCollectionParentPath,
       @NotNull ConfigurationCollectionPersistData data) {
-    if (!enabled) {
+    if (!enabled || isConfigResourcePathDenied(configResourceCollectionParentPath)) {
       return false;
     }
 
@@ -242,7 +255,7 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
 
   @Override
   public boolean deleteConfiguration(@NotNull ResourceResolver resolver, @NotNull String configResourcePath) {
-    if (!enabled) {
+    if (!enabled || isConfigResourcePathDenied(configResourcePath)) {
       return false;
     }
     Resource configResource = resolver.getResource(configResourcePath);
@@ -253,6 +266,15 @@ public class PagePersistenceStrategy implements ConfigurationPersistenceStrategy
     updatePageLastMod(resolver, pageManager, configResourcePath);
     commit(resolver, configResourcePath);
     return true;
+  }
+
+  private boolean isConfigNameDenied(@NotNull String configName) {
+    return configNameDenyList.contains(configName);
+  }
+
+  private boolean isConfigResourcePathDenied(@NotNull String configResourcePath) {
+    String resourceName = ResourceUtil.getName(configResourcePath);
+    return isConfigNameDenied(resourceName);
   }
 
 }

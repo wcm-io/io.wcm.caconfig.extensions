@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.sling.api.resource.Resource;
 import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.hamcrest.ResourceMatchers;
@@ -111,25 +112,6 @@ class PagePersistenceStrategyTest {
     config = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).as(SimpleConfig.class);
     assertNull(config.stringParam());
     assertEquals(5, config.intParam());
-  }
-
-  @Test
-  void testSimpleConfig_Disabled() {
-    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", false);
-
-    // write config
-    writeConfiguration(context, contentPage.getPath(), SimpleConfig.class.getName(),
-        "stringParam", "value1",
-        "intParam", 123);
-
-    // assert storage in page in /conf
-    Page configPage = context.pageManager().getPage("/conf/test/site1/sling:configs/" + SimpleConfig.class.getName());
-    assertNull(configPage);
-
-    // read config
-    SimpleConfig config = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).as(SimpleConfig.class);
-    assertEquals("value1", config.stringParam());
-    assertEquals(123, config.intParam());
   }
 
   @Test
@@ -451,6 +433,84 @@ class PagePersistenceStrategyTest {
     assertThat(configPage2.getContentResource(), ResourceMatchers.props("stringParam", "value2", "intParam", 234));
     assertThat(configPage2.getContentResource(), ResourceMatchers.props(PROPERTY_RESOURCE_TYPE, "app1/components/page/config"));
 
+  }
+
+  @Test
+  void testSimpleConfig_Disabled() {
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", false);
+    doTestSimpleConfig_DisabledOrDenied();
+  }
+
+  @Test
+  void testSimpleConfig_Denied() {
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
+        "configNameDenyList", new String[] { SimpleConfig.class.getName() });
+    doTestSimpleConfig_DisabledOrDenied();
+  }
+
+  void doTestSimpleConfig_DisabledOrDenied() {
+    // write config
+    writeConfiguration(context, contentPage.getPath(), SimpleConfig.class.getName(),
+        "stringParam", "value1",
+        "intParam", 123);
+
+    // assert storage in page in /conf
+    Page configPage = context.pageManager().getPage("/conf/test/site1/sling:configs/" + SimpleConfig.class.getName());
+    assertNull(configPage);
+
+    // read config
+    SimpleConfig config = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).as(SimpleConfig.class);
+    assertEquals("value1", config.stringParam());
+    assertEquals(123, config.intParam());
+
+    // delete
+    ConfigurationManager configManager = context.getService(ConfigurationManager.class);
+    configManager.deleteConfiguration(contentPage.getContentResource(), SimpleConfig.class.getName());
+    config = contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).as(SimpleConfig.class);
+    assertNull(config.stringParam());
+    assertEquals(5, config.intParam());
+  }
+
+  @Test
+  void testListConfig_Disabled() {
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", false);
+    doTestListConfig_DisabledOrDenied();
+  }
+
+  @Test
+  void testListConfig_Denied() {
+    context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
+        "configNameDenyList", new String[] { ListConfig.class.getName() });
+    doTestListConfig_DisabledOrDenied();
+  }
+
+  void doTestListConfig_DisabledOrDenied() {
+    // write config
+    writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
+        ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+        ImmutableValueMap.of("stringParam", "value2", "intParam", 234)),
+        ImmutableValueMap.of("sling:configCollectionInherit", true));
+
+    // assert storage in page in /conf
+    Resource parentResource = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + ListConfig.class.getName());
+    assertNotNull(parentResource);
+    assertTrue(parentResource.getValueMap().get("sling:configCollectionInherit", false));
+
+    Resource configResource1 = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + ListConfig.class.getName() + "/item0");
+    assertThat(configResource1, ResourceMatchers.props("stringParam", "value1", "intParam", 123));
+
+    Resource configResource2 = context.resourceResolver().getResource("/conf/test/site1/sling:configs/" + ListConfig.class.getName() + "/item1");
+    assertThat(configResource2, ResourceMatchers.props("stringParam", "value2", "intParam", 234));
+
+    // read config
+    List<ListConfig> configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class).asCollection(ListConfig.class));
+    assertEquals(2, configs.size());
+    ListConfig config1 = configs.get(0);
+    assertEquals("value1", config1.stringParam());
+    assertEquals(123, config1.intParam());
+    ListConfig config2 = configs.get(1);
+    assertEquals("value2", config2.stringParam());
+    assertEquals(234, config2.intParam());
   }
 
 }
