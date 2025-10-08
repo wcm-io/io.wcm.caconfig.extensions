@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.wrappers.ValueMapDecorator;
@@ -74,9 +75,11 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
       "assetReference1", "/content/dam/test.jpg",
       "assetReference2", "/content/dam/test.jpg"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
+  private static String RESOURCE_TYPE_TO_IGNORE = "mysite/components/ignored";
 
   private Resource site1PageResource;
   private Resource site2PageResource;
+  private Resource site2IgnoredResource;
 
   @BeforeEach
   void setup() {
@@ -94,9 +97,11 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
     Page region1Page = context.create().page("/content/region1/page");
     Page site1Page = context.create().page("/content/region1/site1/page");
     Page site2Page = context.create().page("/content/region1/site2/page");
+    Page site2IgnoredPage = context.create().page("/content/region1/site2/page2", StringUtils.EMPTY, Map.of("sling:resourceType", RESOURCE_TYPE_TO_IGNORE));
 
     site1PageResource = site1Page.adaptTo(Resource.class);
     site2PageResource = site2Page.adaptTo(Resource.class);
+    site2IgnoredResource = site2IgnoredPage.adaptTo(Resource.class);
 
     registerConfigurations(context, ConfigurationA.class, ConfigurationB.class);
 
@@ -156,6 +161,14 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
         "/conf/region1/site2/sling:configs/configB",
         "/conf/global/sling:configs/configB",
         "/content/dam/test.jpg");
+  }
+
+  @Test
+  void testReferencesOfIgnoredPage() {
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class, "ignoreResourceTypes", new String[] {RESOURCE_TYPE_TO_IGNORE});
+    List<Reference> references = referenceProvider.findReferences(site2IgnoredResource);
+
+    assertTrue(references.isEmpty(), "no references");
   }
 
   @Test

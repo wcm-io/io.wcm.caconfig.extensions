@@ -91,6 +91,9 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
         description = "Check for asset references within the context-aware configurations, and add them to the list of references.")
     boolean assetReferences() default false;
 
+    @AttributeDefinition(name = "Ignore Resource Types",
+        description = "Check for the resource type of the page and returns empty list of references if resource type is found.")
+    String[] ignoreResourceTypes() default {};
   }
 
   static final String REFERENCE_TYPE = "caconfig";
@@ -106,6 +109,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
   private boolean enabled;
   private boolean assetReferencesEnabled;
+  private List<String> ignoreResourceTypes;
 
   private static final Logger log = LoggerFactory.getLogger(ConfigurationReferenceProvider.class);
 
@@ -116,6 +120,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
   protected void activate(Config config) {
     enabled = config.enabled();
     assetReferencesEnabled = config.assetReferences();
+    ignoreResourceTypes = List.of(config.ignoreResourceTypes());
   }
 
   @Deactivate
@@ -135,6 +140,10 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     }
     Page contextPage = pageManager.getContainingPage(resource);
     if (contextPage == null) {
+      return Collections.emptyList();
+    }
+
+    if (ignoreResourceTypes.contains(contextPage.getContentResource().getResourceType())) {
       return Collections.emptyList();
     }
 
