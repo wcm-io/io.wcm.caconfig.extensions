@@ -24,8 +24,8 @@
     xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
   <body>
 
-    <release version="1.10.5" date="not released">
-      <action type="update" dev="mpankratiev" issue="22">
+    <release version="1.11.0" date="not released">
+      <action type="add" dev="mpankratiev" issue="22">
         Configuration Reference Provider: Extend configuration with "Ignore Resource Types" to be able to skip references collection for the specific resource types.
       </action>
     </release>

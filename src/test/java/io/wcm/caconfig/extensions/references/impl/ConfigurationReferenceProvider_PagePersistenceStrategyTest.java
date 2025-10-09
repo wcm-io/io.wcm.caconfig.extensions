@@ -75,7 +75,7 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
       "assetReference1", "/content/dam/test.jpg",
       "assetReference2", "/content/dam/test.jpg"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
-  private static String RESOURCE_TYPE_TO_IGNORE = "mysite/components/ignored";
+  private static final String RESOURCE_TYPE_TO_IGNORE = "mysite/components/ignored";
 
   private Resource site1PageResource;
   private Resource site2PageResource;

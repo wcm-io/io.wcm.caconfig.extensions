@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -109,7 +110,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
   private boolean enabled;
   private boolean assetReferencesEnabled;
-  private List<String> ignoreResourceTypes;
+  private Set<String> ignoreResourceTypes;
 
   private static final Logger log = LoggerFactory.getLogger(ConfigurationReferenceProvider.class);
 
@@ -120,7 +121,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
   protected void activate(Config config) {
     enabled = config.enabled();
     assetReferencesEnabled = config.assetReferences();
-    ignoreResourceTypes = List.of(config.ignoreResourceTypes());
+    ignoreResourceTypes = new HashSet<>(List.of(config.ignoreResourceTypes())); // ignore duplicates
   }
 
   @Deactivate
