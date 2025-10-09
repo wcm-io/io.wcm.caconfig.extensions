@@ -24,6 +24,12 @@
     xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
   <body>
 
+    <release version="1.11.0" date="not released">
+      <action type="add" dev="mpankratiev" issue="22">
+        Configuration Reference Provider: Extend configuration with "Context Page Resource Type Allow List" and "Context Page Resource Type Deny List" to be able to allow or skip references collection for the specific context page resource types.
+      </action>
+    </release>
+
     <release version="1.10.4" date="2025-02-19">
       <action type="update" dev="sseifert" issue="11">
         AEM Page persistence strategy: Add OSGi configuration property "Config Name Deny List" which allows to configure a list of configuration names that should not be persisted as AEM pages.
