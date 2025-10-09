@@ -24,13 +24,13 @@ import static io.wcm.caconfig.extensions.references.impl.TestUtils.assertReferen
 import static io.wcm.caconfig.extensions.references.impl.TestUtils.registerConfigurations;
 import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.wrappers.ValueMapDecorator;
@@ -75,11 +75,13 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
       "assetReference1", "/content/dam/test.jpg",
       "assetReference2", "/content/dam/test.jpg"));
   private static final Calendar TIMESTAMP = Calendar.getInstance();
-  private static final String RESOURCE_TYPE_TO_IGNORE = "mysite/components/ignored";
+
+  private static final String RESOURCE_TYPE_DENIED = "mysite/components/deny";
+  private static final String RESOURCE_TYPE_ALLOWED = "mysite/components/allow";
+  private static final String RESOURCE_TYPE_OTHER = "mysite/components/other";
 
   private Resource site1PageResource;
   private Resource site2PageResource;
-  private Resource site2IgnoredResource;
 
   @BeforeEach
   void setup() {
@@ -97,11 +99,9 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
     Page region1Page = context.create().page("/content/region1/page");
     Page site1Page = context.create().page("/content/region1/site1/page");
     Page site2Page = context.create().page("/content/region1/site2/page");
-    Page site2IgnoredPage = context.create().page("/content/region1/site2/page2", StringUtils.EMPTY, Map.of("sling:resourceType", RESOURCE_TYPE_TO_IGNORE));
 
     site1PageResource = site1Page.adaptTo(Resource.class);
     site2PageResource = site2Page.adaptTo(Resource.class);
-    site2IgnoredResource = site2IgnoredPage.adaptTo(Resource.class);
 
     registerConfigurations(context, ConfigurationA.class, ConfigurationB.class);
 
@@ -164,11 +164,45 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
   }
 
   @Test
-  void testReferencesOfIgnoredPage() {
-    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class, "ignoreResourceTypes", new String[] {RESOURCE_TYPE_TO_IGNORE});
-    List<Reference> references = referenceProvider.findReferences(site2IgnoredResource);
+  void testReferencesOfDeniedContextPageResourceType() {
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "contextPageResourceTypeDenyList", new String[] { RESOURCE_TYPE_DENIED });
+
+    Page page = context.create().page("/content/region1/site2/page2", null,
+        "sling:resourceType", RESOURCE_TYPE_DENIED);
+    Resource resource = page.adaptTo(Resource.class);
+
+    List<Reference> references = referenceProvider.findReferences(resource);
 
     assertTrue(references.isEmpty(), "no references");
+  }
+
+  @Test
+  void testReferencesOfNotAllowedContextPageResourceType() {
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "contextPageResourceTypeAllowList", new String[] { RESOURCE_TYPE_ALLOWED });
+
+    Page page = context.create().page("/content/region1/site2/page2", null,
+        "sling:resourceType", RESOURCE_TYPE_OTHER);
+    Resource resource = page.adaptTo(Resource.class);
+
+    List<Reference> references = referenceProvider.findReferences(resource);
+
+    assertTrue(references.isEmpty(), "no references");
+  }
+
+  @Test
+  void testReferencesOfAllowedContextPageResourceType() {
+    ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
+        "contextPageResourceTypeAllowList", new String[] { RESOURCE_TYPE_ALLOWED });
+
+    Page page = context.create().page("/content/region1/site2/page2", null,
+        "sling:resourceType", RESOURCE_TYPE_ALLOWED);
+    Resource resource = page.adaptTo(Resource.class);
+
+    List<Reference> references = referenceProvider.findReferences(resource);
+
+    assertFalse(references.isEmpty(), "has references");
   }
 
   @Test
