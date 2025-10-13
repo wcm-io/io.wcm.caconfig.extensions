@@ -25,13 +25,13 @@
   <parent>
     <groupId>io.wcm</groupId>
     <artifactId>io.wcm.parent_toplevel</artifactId>
-    <version>2.4.4</version>
+    <version>2.6.0</version>
     <relativePath/>
   </parent>
 
   <groupId>io.wcm</groupId>
   <artifactId>io.wcm.caconfig.extensions</artifactId>
-  <version>1.10.4</version>
+  <version>1.11.0</version>
   <packaging>jar</packaging>
 
   <name>Context-Aware Configuration Extensions for AEM</name>
@@ -49,7 +49,7 @@
     <site.url.module.prefix>caconfig/extensions</site.url.module.prefix>
 
     <!-- Enable reproducible builds -->
-    <project.build.outputTimestamp>2025-02-19T11:04:04Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-10-13T14:03:33Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
@@ -134,17 +134,12 @@
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-params</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -160,7 +155,7 @@
     <dependency>
       <groupId>io.wcm</groupId>
       <artifactId>io.wcm.testing.aem-mock.junit5</artifactId>
-      <version>5.5.0</version>
+      <version>5.6.10</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -297,6 +292,23 @@
       </plugin>
 
     </plugins>
+    <pluginManagement>
+      <plugins>
+
+        <!--
+          This project has no javadocs as it has no exported OSGi packages.
+          But we need to generate a javadoc jar to surpass the checks of Sonatype Central portal, which has no clue of OSGi bundles.
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <excludePackageNames>:</excludePackageNames>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
   </build>
 
   <distributionManagement>

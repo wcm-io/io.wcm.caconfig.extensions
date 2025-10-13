@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -91,6 +92,14 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
         description = "Check for asset references within the context-aware configurations, and add them to the list of references.")
     boolean assetReferences() default false;
 
+    @AttributeDefinition(name = "Context Page Resource Type Deny List",
+        description = "Context pages with any of these page content resource types are ignored by the reference provice.")
+    String[] contextPageResourceTypeDenyList() default {};
+
+    @AttributeDefinition(name = "Context Page Resource Type Allow List",
+        description = "The reference provider only gets active for context pages with any of these page content resource types. "
+            + "If the list is empty, it's active for all resource types.")
+    String[] contextPageResourceTypeAllowList() default {};
   }
 
   static final String REFERENCE_TYPE = "caconfig";
@@ -106,6 +115,8 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
   private boolean enabled;
   private boolean assetReferencesEnabled;
+  private Set<String> contextPageResourceTypeDenyList;
+  private Set<String> contextPageResourceTypeAllowList;
 
   private static final Logger log = LoggerFactory.getLogger(ConfigurationReferenceProvider.class);
 
@@ -116,6 +127,8 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
   protected void activate(Config config) {
     enabled = config.enabled();
     assetReferencesEnabled = config.assetReferences();
+    contextPageResourceTypeDenyList = new HashSet<>(List.of(config.contextPageResourceTypeDenyList()));
+    contextPageResourceTypeAllowList = new HashSet<>(List.of(config.contextPageResourceTypeAllowList()));
   }
 
   @Deactivate
@@ -134,7 +147,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
       throw new RuntimeException("No page manager.");
     }
     Page contextPage = pageManager.getContainingPage(resource);
-    if (contextPage == null) {
+    if (contextPage == null || !shouldProcessContextPage(contextPage)) {
       return Collections.emptyList();
     }
 
@@ -171,6 +184,19 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
     log.debug("Found {} references for resource {}", references.size(), resource.getPath());
     return references;
+  }
+
+  /**
+   * Check resource type of context page against allow/deny lists.
+   * @param contextPage Context page
+   * @return true if context page should be processed
+   */
+  private boolean shouldProcessContextPage(@NotNull Page contextPage) {
+    String resourceType = contextPage.getContentResource().getResourceType();
+    if (contextPageResourceTypeDenyList.contains(resourceType)) {
+      return false;
+    }
+    return (contextPageResourceTypeAllowList.isEmpty() || contextPageResourceTypeAllowList.contains(resourceType));
   }
 
   private Collection<Page> getReferencePages(@Nullable Iterator<Resource> configurationInheritanceChain, @NotNull PageManager pageManager) {
