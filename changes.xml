@@ -24,7 +24,7 @@
     xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
   <body>
 
-    <release version="1.11.0" date="not released">
+    <release version="1.11.0" date="2025-10-13">
       <action type="add" dev="mpankratiev" issue="22">
         Configuration Reference Provider: Extend configuration with "Context Page Resource Type Allow List" and "Context Page Resource Type Deny List" to be able to allow or skip references collection for the specific context page resource types.
       </action>
