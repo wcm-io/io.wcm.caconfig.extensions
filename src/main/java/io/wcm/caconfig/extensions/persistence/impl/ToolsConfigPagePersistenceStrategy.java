@@ -74,7 +74,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * In this case the configuration date is stored in a single page at /tools/config which can be easily activated by
  * editors via the authoring GUI, and the configuration can neatly be packaged together with the content.
  */
-@Component(service = { ConfigurationPersistenceStrategy2.class, ConfigurationResourceResolvingStrategy.class })
+@Component(service = {
+    ConfigurationPersistenceStrategy2.class, ConfigurationResourceResolvingStrategy.class
+})
 @Designate(ocd = ToolsConfigPagePersistenceStrategy.Config.class)
 public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersistenceStrategy2, ConfigurationResourceResolvingStrategy {
 
@@ -103,7 +105,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     String relativeConfigPath() default "/tools/config/jcr:content";
 
     @AttributeDefinition(name = "Context path allow list",
-            description = "Expression to match context paths. Context paths matching this expression are allowed.")
+        description = "Expression to match context paths. Context paths matching this expression are allowed.")
     String contextPathRegex() default "^/content(/.+)$";
 
   }
@@ -138,15 +140,15 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   private @Nullable Pattern loadConfigPathPattern(Config value) {
     String relativeConfigPath = value.relativeConfigPath();
     return enabled && StringUtils.isNotBlank(relativeConfigPath)
-            ? Pattern.compile(String.format("^.*%s(/.*)?$", relativeConfigPath))
-            : null;
+        ? Pattern.compile(String.format("^.*%s(/.*)?$", relativeConfigPath))
+        : null;
   }
 
   private @Nullable Pattern loadContextPathPattern(Config value) {
     String contextPathRegex = value.contextPathRegex();
     return enabled && StringUtils.isNotBlank(contextPathRegex)
-            ? Pattern.compile(contextPathRegex)
-            : null;
+        ? Pattern.compile(contextPathRegex)
+        : null;
   }
 
   @Override

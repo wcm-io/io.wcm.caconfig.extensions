@@ -59,16 +59,19 @@ import io.wcm.wcm.commons.contenttype.ContentType;
 class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
 
   private final AemContext context = new AemContextBuilder()
-      .beforeSetUp(new AemContextCallback() {
-        @Override
-        public void execute(@NotNull AemContext ctx) {
-          // also find sling:configRef props in cq:Page/jcr:content nodes
-          MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.resource.impl.def.DefaultContextPathStrategy",
-              "configRefResourceNames", new String[] { "jcr:content", "." });
-        }
-      })
-      .plugin(CACONFIG)
-      .build();
+    .beforeSetUp(new AemContextCallback() {
+
+      @Override
+      public void execute(@NotNull AemContext ctx) {
+        // also find sling:configRef props in cq:Page/jcr:content nodes
+        MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.resource.impl.def.DefaultContextPathStrategy",
+            "configRefResourceNames", new String[] {
+                "jcr:content", "."
+        });
+      }
+    })
+    .plugin(CACONFIG)
+    .build();
 
   private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
   private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar",
@@ -166,7 +169,9 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
   @Test
   void testReferencesOfDeniedContextPageResourceType() {
     ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
-        "contextPageResourceTypeDenyList", new String[] { RESOURCE_TYPE_DENIED });
+        "contextPageResourceTypeDenyList", new String[] {
+            RESOURCE_TYPE_DENIED
+        });
 
     Page page = context.create().page("/content/region1/site2/page2", null,
         "sling:resourceType", RESOURCE_TYPE_DENIED);
@@ -180,7 +185,9 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
   @Test
   void testReferencesOfNotAllowedContextPageResourceType() {
     ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
-        "contextPageResourceTypeAllowList", new String[] { RESOURCE_TYPE_ALLOWED });
+        "contextPageResourceTypeAllowList", new String[] {
+            RESOURCE_TYPE_ALLOWED
+        });
 
     Page page = context.create().page("/content/region1/site2/page2", null,
         "sling:resourceType", RESOURCE_TYPE_OTHER);
@@ -194,7 +201,9 @@ class ConfigurationReferenceProvider_PagePersistenceStrategyTest {
   @Test
   void testReferencesOfAllowedContextPageResourceType() {
     ReferenceProvider referenceProvider = context.registerInjectActivateService(ConfigurationReferenceProvider.class,
-        "contextPageResourceTypeAllowList", new String[] { RESOURCE_TYPE_ALLOWED });
+        "contextPageResourceTypeAllowList", new String[] {
+            RESOURCE_TYPE_ALLOWED
+        });
 
     Page page = context.create().page("/content/region1/site2/page2", null,
         "sling:resourceType", RESOURCE_TYPE_ALLOWED);

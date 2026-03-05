@@ -85,8 +85,8 @@ public class AbsoluteParentContextPathStrategy implements ContextPathStrategy {
     String contextPathBlacklistRegex() default "^.*/tools(/config(/.+)?)?$";
 
     @AttributeDefinition(name = "Template path blacklist",
-            description = "Context paths belonging to a page matching one of the given template paths are not allowed.",
-            required = true)
+        description = "Context paths belonging to a page matching one of the given template paths are not allowed.",
+        required = true)
     String[] templatePathsBlacklist();
 
     @AttributeDefinition(name = "Config path patterns",
