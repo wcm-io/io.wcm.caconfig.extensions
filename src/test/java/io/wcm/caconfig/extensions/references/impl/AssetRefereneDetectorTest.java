@@ -72,7 +72,9 @@ class AssetRefereneDetectorTest {
   void testArrayProperty() {
     Page page = context.create().page("/content/test", null,
         "prop1", "value1", "prop2", 5,
-        "ref", ASSET_1, "refs", new String[] { ASSET_2, ASSET_3 });
+        "ref", ASSET_1, "refs", new String[] {
+            ASSET_2, ASSET_3
+        });
     assertEquals(Set.of(ASSET_1, ASSET_2, ASSET_3), getReferences(page));
   }
 
@@ -90,8 +92,8 @@ class AssetRefereneDetectorTest {
 
   static Set<String> getReferences(@NotNull Page page) {
     return new AssetRefereneDetector(page).getReferencedAssets().stream()
-        .map(Asset::getPath)
-        .collect(Collectors.toSet());
+      .map(Asset::getPath)
+      .collect(Collectors.toSet());
   }
 
 }

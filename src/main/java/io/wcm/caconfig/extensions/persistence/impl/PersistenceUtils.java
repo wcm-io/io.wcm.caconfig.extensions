@@ -216,8 +216,8 @@ final class PersistenceUtils {
    */
   public static void deleteChildrenNotInCollection(Resource resource, ConfigurationCollectionPersistData data) {
     Set<String> collectionItemNames = data.getItems().stream()
-        .map(ConfigurationPersistData::getCollectionItemName)
-        .collect(Collectors.toSet());
+      .map(ConfigurationPersistData::getCollectionItemName)
+      .collect(Collectors.toSet());
 
     for (Resource child : resource.getChildren()) {
       if (!collectionItemNames.contains(child.getName()) && !StringUtils.equals(JCR_CONTENT, child.getName())) {
@@ -282,15 +282,17 @@ final class PersistenceUtils {
   }
 
   /**
-   * Checks if the given item is modified or newly added by comparing its properties with the current state of the resource.
+   * Checks if the given item is modified or newly added by comparing its properties with the current state of the
+   * resource.
    *
-   * @param resolver     The ResourceResolver to access the resource.
+   * @param resolver The ResourceResolver to access the resource.
    * @param resourcePath The path of the resource to compare against.
-   * @param item         The ConfigurationPersistData item containing the properties to compare.
-   * @param settings     The ConfigurationManagementSettings to determine which properties to ignore.
+   * @param item The ConfigurationPersistData item containing the properties to compare.
+   * @param settings The ConfigurationManagementSettings to determine which properties to ignore.
    * @return true if the resource does not exist or if any property value differs, false otherwise.
    */
-  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item, ConfigurationManagementSettings settings) {
+  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item,
+      ConfigurationManagementSettings settings) {
     Resource resource = resolver.getResource(resourcePath);
     if (resource == null) {
       return true; // Resource does not exist, so it is considered modified

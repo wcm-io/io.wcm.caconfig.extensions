@@ -40,8 +40,8 @@ import io.wcm.testing.mock.aem.junit5.AemContextExtension;
 class AemConfigurationInjectResourceDetectionStrategyTest {
 
   private final AemContext context = new AemContextBuilder()
-      .plugin(CACONFIG)
-      .build();
+    .plugin(CACONFIG)
+    .build();
 
   private ConfigurationInjectResourceDetectionStrategyMultiplexer strategyMultiplexer;
 
