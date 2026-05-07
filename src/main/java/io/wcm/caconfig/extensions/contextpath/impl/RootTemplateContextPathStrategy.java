@@ -130,6 +130,7 @@ public class RootTemplateContextPathStrategy implements ContextPathStrategy {
     serviceRanking = config.service_ranking();
   }
 
+  @SuppressWarnings("java:S112") // accept RuntimeException
   @Override
   public @NotNull Iterator<ContextResource> findContextResources(@NotNull Resource resource) {
     if (!isValidConfig()) {

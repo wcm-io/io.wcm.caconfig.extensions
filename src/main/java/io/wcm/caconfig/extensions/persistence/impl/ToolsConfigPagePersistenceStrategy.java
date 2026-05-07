@@ -370,6 +370,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     return getResourceInheritanceChainInternal(bucketNames, configName, paths, resourceResolver);
   }
 
+  @SuppressWarnings("java:S3776") // accept complexity
   private Collection<Resource> getResourceCollectionInternal(final Collection<String> bucketNames, final String configName,
       Iterator<String> paths, ResourceResolver resourceResolver) {
 

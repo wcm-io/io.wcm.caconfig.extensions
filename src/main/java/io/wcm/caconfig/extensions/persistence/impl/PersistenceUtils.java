@@ -247,6 +247,7 @@ final class PersistenceUtils {
     modValueMap.putAll(properties);
   }
 
+  @SuppressWarnings("java:S3824") // do not use Map.computeIfPresent() because we update two properties
   public static void updatePageLastMod(ResourceResolver resolver, PageManager pageManager, String configResourcePath) {
     Page page = pageManager.getContainingPage(configResourcePath);
     if (page == null) {

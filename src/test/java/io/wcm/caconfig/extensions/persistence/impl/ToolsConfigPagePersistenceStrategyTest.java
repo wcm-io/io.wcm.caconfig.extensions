@@ -168,6 +168,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961") // accept number of tests
   void testListConfig_Nested() {
     context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 

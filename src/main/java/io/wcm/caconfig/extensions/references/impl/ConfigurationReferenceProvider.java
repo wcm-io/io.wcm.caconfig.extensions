@@ -138,6 +138,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     enabled = false;
   }
 
+  @SuppressWarnings("java:S112") // accept RuntimeException
   @Override
   public List<com.day.cq.wcm.api.reference.Reference> findReferences(Resource resource) {
     if (!enabled) {
@@ -174,7 +175,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
           // collect asset references
           if (assetReferencesEnabled && configPage.getContentResource() != null) {
             AssetRefereneDetector detector = new AssetRefereneDetector(configPage);
-            detector.getReferencedAssets().stream().forEach(asset -> referencedAssets.put(asset.getPath(), asset));
+            detector.getReferencedAssets().forEach(asset -> referencedAssets.put(asset.getPath(), asset));
           }
         });
     }

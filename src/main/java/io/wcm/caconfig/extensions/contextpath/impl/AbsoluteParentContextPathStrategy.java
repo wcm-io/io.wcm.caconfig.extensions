@@ -148,6 +148,10 @@ public class AbsoluteParentContextPathStrategy implements ContextPathStrategy {
     templatePathsBlacklist = config.templatePathsBlacklist() != null ? new HashSet<>(Arrays.asList(config.templatePathsBlacklist())) : Collections.emptySet();
   }
 
+  @SuppressWarnings({
+      "java:S3776", // accept complexity
+      "java:S112" // accept RuntimeException
+  })
   @Override
   public @NotNull Iterator<ContextResource> findContextResources(@NotNull Resource resource) {
     if (!isValidConfig()) {

@@ -182,7 +182,10 @@ class PagePersistenceStrategyTest {
   }
 
   @Test
-  @SuppressWarnings("java:S2925") // allow thread.sleep
+  @SuppressWarnings({
+      "java:S5961", // accept number of tests
+      "java:S2925" // allow thread.sleep
+  })
   void testListConfig_Nested() throws InterruptedException {
     context.registerInjectActivateService(PagePersistenceStrategy.class,
         "enabled", true,
