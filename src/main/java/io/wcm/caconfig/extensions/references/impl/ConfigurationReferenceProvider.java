@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.caconfig.management.ConfigurationResourceResolverConfig;
@@ -167,7 +168,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
       // generate references for each page (but not if the context page itself is included as well)
       referencePages.stream()
-        .filter(configPage -> !StringUtils.equals(contextPage.getPath(), configPage.getPath()))
+        .filter(configPage -> !Strings.CS.equals(contextPage.getPath(), configPage.getPath()))
         .forEach(configPage -> {
           references.add(toReference(resource, configPage, configurationMetadatas, configurationBuckets));
           // collect asset references

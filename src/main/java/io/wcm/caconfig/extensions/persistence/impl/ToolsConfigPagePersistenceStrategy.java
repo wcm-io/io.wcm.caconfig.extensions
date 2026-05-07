@@ -41,6 +41,7 @@ import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.collections4.iterators.FilterIterator;
 import org.apache.commons.collections4.iterators.TransformIterator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceUtil;
@@ -65,8 +66,6 @@ import org.slf4j.LoggerFactory;
 
 import com.day.cq.wcm.api.PageManager;
 import com.day.cq.wcm.api.PageManagerFactory;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * AEM-specific persistence strategy that gets only active if a context path is redirected to path
@@ -206,7 +205,6 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   }
 
   @Override
-  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public boolean persistConfiguration(@NotNull ResourceResolver resolver, @NotNull String configResourcePath,
       @NotNull ConfigurationPersistData data) {
     if (!enabled || !isConfigPagePath(configResourcePath)) {
@@ -462,7 +460,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
 
   private boolean isValidResourceCollectionItem(Resource resource) {
     // do not include jcr:content nodes in resource collection list
-    return !StringUtils.equals(resource.getName(), "jcr:content");
+    return !Strings.CS.equals(resource.getName(), "jcr:content");
   }
 
   @Override
