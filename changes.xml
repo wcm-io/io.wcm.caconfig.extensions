@@ -28,7 +28,7 @@
       <action type="update" dev="sseifert">
         Switch to AEM 6.5.24 as minimum version (also compatible with AEM 6.6.2 / AEM 6.5 LTS SP2 and AEMaaCS).
       </action>
-      <action type="update" dev="sseifert">
+      <action type="update" dev="sseifert" issue="37">
         Eliminate usage of com.day.cq.wcm.commons which is deprecated in AEMaaCS since 2026-07-01.
       </action>
     </release>
