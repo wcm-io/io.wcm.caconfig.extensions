@@ -65,17 +65,21 @@ import io.wcm.testing.mock.aem.junit5.AemContextExtension;
 class ToolsConfigPagePersistenceStrategyTest {
 
   final AemContext context = new AemContextBuilder()
-      .plugin(CACONFIG)
-      .build();
+    .plugin(CACONFIG)
+    .build();
 
   private Page contentPage;
 
   @BeforeEach
   void setUp() {
     context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
-        "levels", new int[] { 1, 3 },
+        "levels", new int[] {
+            1, 3
+        },
         "contextPathRegex", "^/content(/.+)$",
-        "configPathPatterns", new String[] { "/conf$1", "/content$1/tools/config/jcr:content" });
+        "configPathPatterns", new String[] {
+            "/conf$1", "/content$1/tools/config/jcr:content"
+        });
     context.registerInjectActivateService(ToolsConfigPagePersistenceStrategy.class,
         "enabled", true,
         "configPageTemplate", "/apps/app1/templates/configEditor",
@@ -164,6 +168,7 @@ class ToolsConfigPagePersistenceStrategyTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961") // accept number of tests
   void testListConfig_Nested() {
     context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true);
 
@@ -198,7 +203,7 @@ class ToolsConfigPagePersistenceStrategyTest {
 
     // read config
     List<ListNestedConfig> configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
-        .asCollection(ListNestedConfig.class));
+      .asCollection(ListNestedConfig.class));
     assertEquals(2, configs.size());
 
     ListNestedConfig config1 = configs.get(0);
@@ -222,7 +227,7 @@ class ToolsConfigPagePersistenceStrategyTest {
 
     // read config
     configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
-        .asCollection(ListNestedConfig.class));
+      .asCollection(ListNestedConfig.class));
     assertEquals(3, configs.size());
 
     config1 = configs.get(0);
@@ -301,8 +306,8 @@ class ToolsConfigPagePersistenceStrategyTest {
     Calendar cal = Calendar.getInstance();
     cal.add(Calendar.HOUR, -1);
     context.create().page("/content/region2/site2/en/tools/config", "/apps/app1/templates/configEditor", ImmutableValueMap.builder()
-        .put(NameConstants.PN_PAGE_LAST_MOD, cal)
-        .build());
+      .put(NameConstants.PN_PAGE_LAST_MOD, cal)
+      .build());
 
     // write config
     writeConfiguration(context, contentPageWithCQLastModified.getPath(), SimpleConfig.class.getName(),

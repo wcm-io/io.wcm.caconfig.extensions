@@ -29,7 +29,6 @@ import org.osgi.service.component.propertytypes.ServiceRanking;
 
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.components.ComponentContext;
-import com.day.cq.wcm.commons.WCMUtils;
 
 /**
  * AEM-specific implementation of {@link ConfigurationInjectResourceDetectionStrategy}.
@@ -51,7 +50,7 @@ public class AemConfigurationInjectResourceDetectionStrategy implements Configur
   }
 
   private @Nullable Page getCurrentPage(@NotNull SlingHttpServletRequest request) {
-    ComponentContext componentContext = WCMUtils.getComponentContext(request);
+    ComponentContext componentContext = (ComponentContext)request.getAttribute(ComponentContext.CONTEXT_ATTR_NAME);
     if (componentContext != null) {
       return componentContext.getPage();
     }

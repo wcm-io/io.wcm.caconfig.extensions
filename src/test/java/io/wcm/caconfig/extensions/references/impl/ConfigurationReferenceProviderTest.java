@@ -55,16 +55,19 @@ import io.wcm.wcm.commons.contenttype.ContentType;
 class ConfigurationReferenceProviderTest {
 
   private final AemContext context = new AemContextBuilder()
-      .beforeSetUp(new AemContextCallback() {
-        @Override
-        public void execute(@NotNull AemContext ctx) {
-          // also find sling:configRef props in cq:Page/jcr:content nodes
-          MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.resource.impl.def.DefaultContextPathStrategy",
-              "configRefResourceNames", new String[] { "jcr:content", "." });
-        }
-      })
-      .plugin(CACONFIG)
-      .build();
+    .beforeSetUp(new AemContextCallback() {
+
+      @Override
+      public void execute(@NotNull AemContext ctx) {
+        // also find sling:configRef props in cq:Page/jcr:content nodes
+        MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.resource.impl.def.DefaultContextPathStrategy",
+            "configRefResourceNames", new String[] {
+                "jcr:content", "."
+        });
+      }
+    })
+    .plugin(CACONFIG)
+    .build();
 
   private static final ValueMap CONFIGURATION_A = new ValueMapDecorator(Map.of("key", "foo"));
   private static final ValueMap CONFIGURATION_B = new ValueMapDecorator(Map.of("key", "bar",

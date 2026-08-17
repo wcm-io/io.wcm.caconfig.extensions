@@ -25,7 +25,8 @@ The following extensions are provided:
 
 |Context-Aware Configuration Extensions for AEM version |AEM version supported
 |-------------------------------------------------------|----------------------
-|1.9.6 or higher                                        |AEM 6.5.17+ *), AEMaaCS
+|1.12.0 or higher                                       |AEM 6.5.24+ *), AEM 6.6.2+, AEMaaCS
+|1.9.6 - 1.11.x                                         |AEM 6.5.17+ *), AEM 6.6.0+, AEMaaCS
 |1.9.2 - 1.9.4                                          |AEM 6.5.7+ *), AEMaaCS
 |1.9.0                                                  |AEM 6.5+ *), AEMaaCS
 |1.8.x                                                  |AEM 6.4+, AEMaaCS

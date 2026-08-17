@@ -41,6 +41,7 @@ import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.collections4.iterators.FilterIterator;
 import org.apache.commons.collections4.iterators.TransformIterator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceUtil;
@@ -66,15 +67,15 @@ import org.slf4j.LoggerFactory;
 import com.day.cq.wcm.api.PageManager;
 import com.day.cq.wcm.api.PageManagerFactory;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * AEM-specific persistence strategy that gets only active if a context path is redirected to path
  * <code>/content/.../tools/config</code>.
  * In this case the configuration date is stored in a single page at /tools/config which can be easily activated by
  * editors via the authoring GUI, and the configuration can neatly be packaged together with the content.
  */
-@Component(service = { ConfigurationPersistenceStrategy2.class, ConfigurationResourceResolvingStrategy.class })
+@Component(service = {
+    ConfigurationPersistenceStrategy2.class, ConfigurationResourceResolvingStrategy.class
+})
 @Designate(ocd = ToolsConfigPagePersistenceStrategy.Config.class)
 public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersistenceStrategy2, ConfigurationResourceResolvingStrategy {
 
@@ -103,7 +104,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     String relativeConfigPath() default "/tools/config/jcr:content";
 
     @AttributeDefinition(name = "Context path allow list",
-            description = "Expression to match context paths. Context paths matching this expression are allowed.")
+        description = "Expression to match context paths. Context paths matching this expression are allowed.")
     String contextPathRegex() default "^/content(/.+)$";
 
   }
@@ -138,15 +139,15 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   private @Nullable Pattern loadConfigPathPattern(Config value) {
     String relativeConfigPath = value.relativeConfigPath();
     return enabled && StringUtils.isNotBlank(relativeConfigPath)
-            ? Pattern.compile(String.format("^.*%s(/.*)?$", relativeConfigPath))
-            : null;
+        ? Pattern.compile(String.format("^.*%s(/.*)?$", relativeConfigPath))
+        : null;
   }
 
   private @Nullable Pattern loadContextPathPattern(Config value) {
     String contextPathRegex = value.contextPathRegex();
     return enabled && StringUtils.isNotBlank(contextPathRegex)
-            ? Pattern.compile(contextPathRegex)
-            : null;
+        ? Pattern.compile(contextPathRegex)
+        : null;
   }
 
   @Override
@@ -204,7 +205,6 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
   }
 
   @Override
-  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public boolean persistConfiguration(@NotNull ResourceResolver resolver, @NotNull String configResourcePath,
       @NotNull ConfigurationPersistData data) {
     if (!enabled || !isConfigPagePath(configResourcePath)) {
@@ -370,6 +370,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
     return getResourceInheritanceChainInternal(bucketNames, configName, paths, resourceResolver);
   }
 
+  @SuppressWarnings("java:S3776") // accept complexity
   private Collection<Resource> getResourceCollectionInternal(final Collection<String> bucketNames, final String configName,
       Iterator<String> paths, ResourceResolver resourceResolver) {
 
@@ -460,7 +461,7 @@ public class ToolsConfigPagePersistenceStrategy implements ConfigurationPersiste
 
   private boolean isValidResourceCollectionItem(Resource resource) {
     // do not include jcr:content nodes in resource collection list
-    return !StringUtils.equals(resource.getName(), "jcr:content");
+    return !Strings.CS.equals(resource.getName(), "jcr:content");
   }
 
   @Override

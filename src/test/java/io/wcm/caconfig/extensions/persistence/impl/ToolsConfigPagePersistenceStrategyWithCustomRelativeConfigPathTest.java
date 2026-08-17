@@ -49,25 +49,29 @@ import io.wcm.testing.mock.aem.junit5.AemContextExtension;
 class ToolsConfigPagePersistenceStrategyWithCustomRelativeConfigPathTest {
 
   final AemContext context = new AemContextBuilder()
-          .plugin(CACONFIG)
-          .build();
+    .plugin(CACONFIG)
+    .build();
 
   private Page contentPage;
 
   @BeforeEach
   void setUp() {
     context.registerInjectActivateService(AbsoluteParentContextPathStrategy.class,
-            "levels", new int[] { 1, 3 },
-            "contextPathRegex", "^/content(/.+)$",
-            "configPathPatterns", new String[] { "/conf$1", "/content$1/tools/other-config/jcr:content" });
+        "levels", new int[] {
+            1, 3
+        },
+        "contextPathRegex", "^/content(/.+)$",
+        "configPathPatterns", new String[] {
+            "/conf$1", "/content$1/tools/other-config/jcr:content"
+        });
     context.registerInjectActivateService(ToolsConfigPagePersistenceStrategy.class,
-            "enabled", true,
-            "configPageTemplate", "/apps/app1/templates/configEditor",
-            "structurePageTemplate", "/apps/app1/templates/structurePage",
-            "relativeConfigPath", "/tools/other-config/jcr:content");
+        "enabled", true,
+        "configPageTemplate", "/apps/app1/templates/configEditor",
+        "structurePageTemplate", "/apps/app1/templates/structurePage",
+        "relativeConfigPath", "/tools/other-config/jcr:content");
 
     context.create().resource("/apps/app1/templates/configEditor/jcr:content",
-            PROPERTY_RESOURCE_TYPE, "app1/components/page/configEditor");
+        PROPERTY_RESOURCE_TYPE, "app1/components/page/configEditor");
 
     context.create().page("/content/region1");
     context.create().page("/content/region1/site1");
@@ -79,24 +83,24 @@ class ToolsConfigPagePersistenceStrategyWithCustomRelativeConfigPathTest {
   void testSimpleConfig() {
     // write config
     writeConfiguration(context, contentPage.getPath(), SimpleConfig.class.getName(),
-            "stringParam", "value1",
-            "intParam", 123);
+        "stringParam", "value1",
+        "intParam", 123);
 
     // assert storage in page in /content/*/tools/config
     Page configPage = context.pageManager().getPage("/content/region1/site1/en/tools/other-config");
     assertThat(configPage.getContentResource(), ResourceMatchers.props(
-            NameConstants.PN_TEMPLATE, "/apps/app1/templates/configEditor",
-            NameConstants.PN_TITLE, "other-config",
-            PROPERTY_RESOURCE_TYPE, "app1/components/page/configEditor"));
+        NameConstants.PN_TEMPLATE, "/apps/app1/templates/configEditor",
+        NameConstants.PN_TITLE, "other-config",
+        PROPERTY_RESOURCE_TYPE, "app1/components/page/configEditor"));
     assertThat(configPage.getContentResource("sling:configs/" + SimpleConfig.class.getName()), ResourceMatchers.props(
-            "stringParam", "value1",
-            "intParam", 123));
+        "stringParam", "value1",
+        "intParam", 123));
 
     Page toolsPage = context.pageManager().getPage("/content/region1/site1/en/tools");
     assertThat(toolsPage.getContentResource(), ResourceMatchers.props(
-            NameConstants.PN_TEMPLATE, "/apps/app1/templates/structurePage",
-            NameConstants.PN_TITLE, "tools",
-            PROPERTY_RESOURCE_TYPE, null));
+        NameConstants.PN_TEMPLATE, "/apps/app1/templates/structurePage",
+        NameConstants.PN_TITLE, "tools",
+        PROPERTY_RESOURCE_TYPE, null));
 
     // read config
     SimpleConfig config = AdaptTo.notNull(contentPage.getContentResource(), ConfigurationBuilder.class).as(SimpleConfig.class);

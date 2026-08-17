@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.sling.api.resource.ModifiableValueMap;
 import org.apache.sling.api.resource.PersistenceException;
 import org.apache.sling.api.resource.Resource;
@@ -216,11 +217,11 @@ final class PersistenceUtils {
    */
   public static void deleteChildrenNotInCollection(Resource resource, ConfigurationCollectionPersistData data) {
     Set<String> collectionItemNames = data.getItems().stream()
-        .map(ConfigurationPersistData::getCollectionItemName)
-        .collect(Collectors.toSet());
+      .map(ConfigurationPersistData::getCollectionItemName)
+      .collect(Collectors.toSet());
 
     for (Resource child : resource.getChildren()) {
-      if (!collectionItemNames.contains(child.getName()) && !StringUtils.equals(JCR_CONTENT, child.getName())) {
+      if (!collectionItemNames.contains(child.getName()) && !Strings.CS.equals(JCR_CONTENT, child.getName())) {
         deletePageOrResource(child);
       }
     }
@@ -246,6 +247,7 @@ final class PersistenceUtils {
     modValueMap.putAll(properties);
   }
 
+  @SuppressWarnings("java:S3824") // do not use Map.computeIfPresent() because we update two properties
   public static void updatePageLastMod(ResourceResolver resolver, PageManager pageManager, String configResourcePath) {
     Page page = pageManager.getContainingPage(configResourcePath);
     if (page == null) {
@@ -282,15 +284,17 @@ final class PersistenceUtils {
   }
 
   /**
-   * Checks if the given item is modified or newly added by comparing its properties with the current state of the resource.
+   * Checks if the given item is modified or newly added by comparing its properties with the current state of the
+   * resource.
    *
-   * @param resolver     The ResourceResolver to access the resource.
+   * @param resolver The ResourceResolver to access the resource.
    * @param resourcePath The path of the resource to compare against.
-   * @param item         The ConfigurationPersistData item containing the properties to compare.
-   * @param settings     The ConfigurationManagementSettings to determine which properties to ignore.
+   * @param item The ConfigurationPersistData item containing the properties to compare.
+   * @param settings The ConfigurationManagementSettings to determine which properties to ignore.
    * @return true if the resource does not exist or if any property value differs, false otherwise.
    */
-  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item, ConfigurationManagementSettings settings) {
+  public static boolean isItemModifiedOrNewlyAdded(ResourceResolver resolver, String resourcePath, ConfigurationPersistData item,
+      ConfigurationManagementSettings settings) {
     Resource resource = resolver.getResource(resourcePath);
     if (resource == null) {
       return true; // Resource does not exist, so it is considered modified
@@ -336,15 +340,15 @@ final class PersistenceUtils {
 
   private static ConfigurationPersistenceException convertWCMException(String message, WCMException ex) {
     String causeClsName = ex.getCause().getClass().getName();
-    if (StringUtils.equals(causeClsName, "com.day.cq.replication.AccessDeniedException")
-        || StringUtils.equals(causeClsName, "javax.jcr.AccessDeniedException")) {
+    if (Strings.CS.equals(causeClsName, "com.day.cq.replication.AccessDeniedException")
+        || Strings.CS.equals(causeClsName, "javax.jcr.AccessDeniedException")) {
       return new ConfigurationPersistenceAccessDeniedException("No write access: " + message, ex);
     }
     return new ConfigurationPersistenceException(message, ex);
   }
 
   private static ConfigurationPersistenceException convertPersistenceException(String message, PersistenceException ex) {
-    if (StringUtils.equals(ex.getCause().getClass().getName(), "javax.jcr.AccessDeniedException")) {
+    if (Strings.CS.equals(ex.getCause().getClass().getName(), "javax.jcr.AccessDeniedException")) {
       // detect if commit failed due to read-only access to repository
       return new ConfigurationPersistenceAccessDeniedException("No write access: " + message, ex);
     }

@@ -24,6 +24,15 @@
     xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
   <body>
 
+    <release version="1.12.0" date="2026-08-17">
+      <action type="update" dev="sseifert">
+        Switch to AEM 6.5.24 as minimum version (also compatible with AEM 6.6.2 / AEM 6.5 LTS SP2 and AEMaaCS).
+      </action>
+      <action type="update" dev="sseifert" issue="37">
+        Eliminate usage of com.day.cq.wcm.commons which is deprecated in AEMaaCS since 2026-07-01.
+      </action>
+    </release>
+
     <release version="1.11.0" date="2025-10-13">
       <action type="add" dev="mpankratiev" issue="22">
         Configuration Reference Provider: Extend configuration with "Context Page Resource Type Allow List" and "Context Page Resource Type Deny List" to be able to allow or skip references collection for the specific context page resource types.

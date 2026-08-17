@@ -44,18 +44,18 @@ class RequestHeaderConfigurationOverrideProviderTest {
   private static final String HEADER_NAME = "testHeaderName";
 
   private final AemContext context = new AemContextBuilder()
-      .beforeSetUp(aemContext -> {
-        // register request context
-        aemContext.registerService(RequestContext.class, new MockRequestContext());
+    .beforeSetUp(aemContext -> {
+      // register request context
+      aemContext.registerService(RequestContext.class, new MockRequestContext());
 
-        // register sling models extensions
-        aemContext.registerInjectActivateService(new ModelsImplConfiguration(),
-            Map.<String, Object>of("requestThreadLocal", true));
+      // register sling models extensions
+      aemContext.registerInjectActivateService(new ModelsImplConfiguration(),
+          Map.<String, Object>of("requestThreadLocal", true));
 
-        aemContext.registerInjectActivateService(new AemObjectInjector());
-        aemContext.registerInjectActivateService(new SlingObjectOverlayInjector());
-      })
-      .build();
+      aemContext.registerInjectActivateService(new AemObjectInjector());
+      aemContext.registerInjectActivateService(new SlingObjectOverlayInjector());
+    })
+    .build();
 
   @BeforeEach
   @SuppressWarnings("null")

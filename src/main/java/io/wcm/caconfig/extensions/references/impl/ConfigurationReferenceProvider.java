@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.caconfig.management.ConfigurationManager;
 import org.apache.sling.caconfig.management.ConfigurationResourceResolverConfig;
@@ -67,7 +68,8 @@ import com.day.cq.wcm.api.reference.ReferenceProvider;
  *
  * <p>
  * This is for example used by ActivationReferenceSearchServlet to resolve referenced content of pages during activation
- * of a page using AEM sites. Returning the configurations and (if enabled) asset references allows the editor to activate
+ * of a page using AEM sites. Returning the configurations and (if enabled) asset references allows the editor to
+ * activate
  * them along with the page referring to them.
  * </p>
  *
@@ -136,6 +138,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     enabled = false;
   }
 
+  @SuppressWarnings("java:S112") // accept RuntimeException
   @Override
   public List<com.day.cq.wcm.api.reference.Reference> findReferences(Resource resource) {
     if (!enabled) {
@@ -152,7 +155,7 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
     }
 
     Map<String, ConfigurationMetadata> configurationMetadatas = new TreeMap<>(configurationManager.getConfigurationNames().stream()
-        .collect(Collectors.toMap(configName -> configName, configName -> configurationManager.getConfigurationMetadata(configName))));
+      .collect(Collectors.toMap(configName -> configName, configName -> configurationManager.getConfigurationMetadata(configName))));
     List<com.day.cq.wcm.api.reference.Reference> references = new ArrayList<>();
     Map<String, Asset> referencedAssets = new TreeMap<>();
     Set<String> configurationBuckets = new LinkedHashSet<>(configurationResourceResolverConfig.configBucketNames());
@@ -166,15 +169,15 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
 
       // generate references for each page (but not if the context page itself is included as well)
       referencePages.stream()
-          .filter(configPage -> !StringUtils.equals(contextPage.getPath(), configPage.getPath()))
-          .forEach(configPage -> {
-            references.add(toReference(resource, configPage, configurationMetadatas, configurationBuckets));
-            // collect asset references
-            if (assetReferencesEnabled && configPage.getContentResource() != null) {
-              AssetRefereneDetector detector = new AssetRefereneDetector(configPage);
-              detector.getReferencedAssets().stream().forEach(asset -> referencedAssets.put(asset.getPath(), asset));
-            }
-          });
+        .filter(configPage -> !Strings.CS.equals(contextPage.getPath(), configPage.getPath()))
+        .forEach(configPage -> {
+          references.add(toReference(resource, configPage, configurationMetadatas, configurationBuckets));
+          // collect asset references
+          if (assetReferencesEnabled && configPage.getContentResource() != null) {
+            AssetRefereneDetector detector = new AssetRefereneDetector(configPage);
+            detector.getReferencedAssets().forEach(asset -> referencedAssets.put(asset.getPath(), asset));
+          }
+        });
     }
 
     if (!referencedAssets.isEmpty()) {
@@ -244,17 +247,17 @@ public class ConfigurationReferenceProvider implements ReferenceProvider {
       Map<String, ConfigurationMetadata> configurationMetadatas, Set<String> configurationBuckets) {
     List<String> pathParts = Arrays.asList(StringUtils.split(configPage.getPath(), "/"));
     return pathParts.stream()
-        .filter(name -> !configurationBuckets.contains(name))
-        .map(name -> {
-          ConfigurationMetadata configMetadata = configurationMetadatas.get(name);
-          if (configMetadata != null && configMetadata.getLabel() != null) {
-            return configMetadata.getLabel();
-          }
-          else {
-            return name;
-          }
-        })
-        .collect(Collectors.joining(" / "));
+      .filter(name -> !configurationBuckets.contains(name))
+      .map(name -> {
+        ConfigurationMetadata configMetadata = configurationMetadatas.get(name);
+        if (configMetadata != null && configMetadata.getLabel() != null) {
+          return configMetadata.getLabel();
+        }
+        else {
+          return name;
+        }
+      })
+      .collect(Collectors.joining(" / "));
   }
 
   private static long getLastModifiedOf(Page page) {

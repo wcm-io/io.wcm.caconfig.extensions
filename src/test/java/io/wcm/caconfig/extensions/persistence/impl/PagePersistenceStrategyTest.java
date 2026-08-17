@@ -64,20 +64,27 @@ import io.wcm.testing.mock.aem.junit5.AemContextExtension;
 class PagePersistenceStrategyTest {
 
   final AemContext context = new AemContextBuilder()
-      .beforeSetUp(new AemContextCallback() {
-        @Override
-        public void execute(@NotNull AemContext ctx) {
-          // also find sling:configRef props in cq:Page/jcr:content nodes
-          MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.resource.impl.def.DefaultContextPathStrategy",
-              "configRefResourceNames", new String[] { "jcr:content", "." });
-          // AEM-specific configuration management settings
-          MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.management.impl.ConfigurationManagementSettingsImpl",
-              "ignorePropertyNameRegex", new String[] { "^(jcr|cq):.+", "^" + PROPERTY_RESOURCE_TYPE + "$" },
-              "configCollectionPropertiesResourceNames", new String[] { "jcr:content", "." });
-        }
-      })
-      .plugin(CACONFIG)
-      .build();
+    .beforeSetUp(new AemContextCallback() {
+
+      @Override
+      public void execute(@NotNull AemContext ctx) {
+        // also find sling:configRef props in cq:Page/jcr:content nodes
+        MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.resource.impl.def.DefaultContextPathStrategy",
+            "configRefResourceNames", new String[] {
+                "jcr:content", "."
+        });
+        // AEM-specific configuration management settings
+        MockOsgi.setConfigForPid(ctx.bundleContext(), "org.apache.sling.caconfig.management.impl.ConfigurationManagementSettingsImpl",
+            "ignorePropertyNameRegex", new String[] {
+                "^(jcr|cq):.+", "^" + PROPERTY_RESOURCE_TYPE + "$"
+        },
+            "configCollectionPropertiesResourceNames", new String[] {
+                "jcr:content", "."
+        });
+      }
+    })
+    .plugin(CACONFIG)
+    .build();
 
   private Page contentPage;
 
@@ -121,8 +128,7 @@ class PagePersistenceStrategyTest {
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
         ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
-        ImmutableValueMap.of("stringParam", "value2", "intParam", 234)
-    ),
+        ImmutableValueMap.of("stringParam", "value2", "intParam", 234)),
         ImmutableValueMap.of("sling:configCollectionInherit", true));
 
     // assert storage in page in /conf
@@ -153,9 +159,8 @@ class PagePersistenceStrategyTest {
 
     // write config
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
-            ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
-            ImmutableValueMap.of("stringParam", "value2", "intParam", 234)
-    ));
+        ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+        ImmutableValueMap.of("stringParam", "value2", "intParam", 234)));
 
     // assert storage in page in /conf
     Page parentPage = context.pageManager().getPage("/conf/test/site1/sling:configs/" + ListConfig.class.getName());
@@ -168,17 +173,19 @@ class PagePersistenceStrategyTest {
     assertThat(configPage2.getContentResource(), ResourceMatchers.props("stringParam", "value2", "intParam", 234));
 
     writeConfigurationCollection(context, contentPage.getPath(), ListConfig.class.getName(), List.of(
-            ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
-            ImmutableValueMap.of("stringParam", "value2")
-    ));
+        ImmutableValueMap.of("stringParam", "value1", "intParam", 123),
+        ImmutableValueMap.of("stringParam", "value2")));
     Calendar lastModifiedConfigPage2AfterUpdate = configPage2.getContentResource().getValueMap().get(PN_LAST_MOD, Calendar.class);
     System.out.println(lastModifiedConfigPage2AfterUpdate);
     //ConfigPage2 last modified date should be updated because it is updated
-      assertNotNull(lastModifiedConfigPage2AfterUpdate);
+    assertNotNull(lastModifiedConfigPage2AfterUpdate);
   }
 
   @Test
-  @SuppressWarnings("java:S2925") // allow thread.sleep
+  @SuppressWarnings({
+      "java:S5961", // accept number of tests
+      "java:S2925" // allow thread.sleep
+  })
   void testListConfig_Nested() throws InterruptedException {
     context.registerInjectActivateService(PagePersistenceStrategy.class,
         "enabled", true,
@@ -209,7 +216,7 @@ class PagePersistenceStrategyTest {
 
     // read config
     List<ListNestedConfig> configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
-        .asCollection(ListNestedConfig.class));
+      .asCollection(ListNestedConfig.class));
     assertEquals(2, configs.size());
 
     ListNestedConfig config1 = configs.get(0);
@@ -238,7 +245,7 @@ class PagePersistenceStrategyTest {
 
     // read config
     configs = List.copyOf(contentPage.getContentResource().adaptTo(ConfigurationBuilder.class)
-        .asCollection(ListNestedConfig.class));
+      .asCollection(ListNestedConfig.class));
     assertEquals(3, configs.size());
 
     config1 = configs.get(0);
@@ -444,7 +451,9 @@ class PagePersistenceStrategyTest {
   @Test
   void testSimpleConfig_Denied() {
     context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
-        "configNameDenyList", new String[] { SimpleConfig.class.getName() });
+        "configNameDenyList", new String[] {
+            SimpleConfig.class.getName()
+        });
     doTestSimpleConfig_DisabledOrDenied();
   }
 
@@ -480,7 +489,9 @@ class PagePersistenceStrategyTest {
   @Test
   void testListConfig_Denied() {
     context.registerInjectActivateService(PagePersistenceStrategy.class, "enabled", true,
-        "configNameDenyList", new String[] { ListConfig.class.getName() });
+        "configNameDenyList", new String[] {
+            ListConfig.class.getName()
+        });
     doTestListConfig_DisabledOrDenied();
   }
 

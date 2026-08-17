@@ -88,8 +88,8 @@ class AssetRefereneDetector {
   private void findAssetReferences(@NotNull Resource resource) {
     ValueMap props = resource.getValueMap();
     assets.addAll(props.values().stream()
-        .flatMap(this::getAssetsIfAssetReference)
-        .collect(Collectors.toList()));
+      .flatMap(this::getAssetsIfAssetReference)
+      .collect(Collectors.toList()));
   }
 
   /**
